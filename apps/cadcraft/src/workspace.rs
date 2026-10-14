@@ -25,9 +25,9 @@ fn config_dir_from(platform: &str, get: impl Fn(&str) -> Option<OsString>) -> Op
     }
     let nonempty = |key| get(key).filter(|value| !value.is_empty()).map(PathBuf::from);
     match platform {
-        "macos" => nonempty("HOME").map(|home| home.join("Library/Application Support/CADCraft")),
-        "windows" => nonempty("APPDATA").map(|root| root.join("CADCraft")),
-        _ => nonempty("XDG_CONFIG_HOME").map(|root| root.join("cadcraft")).or_else(|| nonempty("HOME").map(|home| home.join(".config/cadcraft"))),
+        "macos" => nonempty("HOME").map(|home| home.join("Library/Application Support/FisiCAD")),
+        "windows" => nonempty("APPDATA").map(|root| root.join("FisiCAD")),
+        _ => nonempty("XDG_CONFIG_HOME").map(|root| root.join("fisicad")).or_else(|| nonempty("HOME").map(|home| home.join(".config/fisicad"))),
     }
 }
 
@@ -195,7 +195,7 @@ mod tests {
         }
         assert_eq!(
             config_dir_from("linux", |key| (key == "XDG_CONFIG_HOME").then(|| OsString::from("/config"))),
-            Some(PathBuf::from("/config/cadcraft"))
+            Some(PathBuf::from("/config/fisicad"))
         );
         assert_eq!(config_dir_from("macos", |_| None), None);
     }

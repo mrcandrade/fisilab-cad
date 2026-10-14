@@ -39,6 +39,8 @@ pub const UI_COMMANDS: &[(&str, &str, &[&str], Option<&str>)] = &[
     ("ui.toggle.cmdline", "Command Line", &["Window", "Command Line"], Some("Cmd+9")),
     ("ui.toggle.viewcube", "ViewCube", &["View", "ViewCube", "On"], None),
     ("ui.toggle.ucsicon", "UCS Icon", &["View", "UCS Icon", "On"], None),
+    ("ui.theme.ufrgsNoite", "UFRGS Noite", &["View", "Interface Theme", "UFRGS Noite"], None),
+    ("ui.theme.ufrgsDia", "UFRGS Dia", &["View", "Interface Theme", "UFRGS Dia"], None),
     ("ui.theme.system", "Use System Setting", &["View", "Interface Theme", "Use System Setting"], None),
     ("ui.theme.light", "Light", &["View", "Interface Theme", "Light"], None),
     ("ui.theme.dark", "Dark", &["View", "Interface Theme", "Dark"], None),
@@ -62,15 +64,16 @@ pub const UI_COMMANDS: &[(&str, &str, &[&str], Option<&str>)] = &[
     ("ui.dialog.qselect", "Quick Select...", &[], None),
     ("ui.dialog.parameters", "Parameters Manager", &["Window", "Parameters Manager"], None),
     ("ui.dialog.dsettings", "Drafting Settings...", &[], None),
-    ("ui.dialog.about", "About CADCraft", &["Help", "About CADCraft"], None),
-    ("ui.dialog.commands", "Command Reference", &["Help", "CADCraft Help"], Some("F1")),
+    ("ui.dialog.about", "About FisiCAD", &["Help", "About FisiCAD"], None),
+    ("ui.fisilab.about", fisilab_brand::ABOUT_MENU_LABEL, &["Help", fisilab_brand::ABOUT_MENU_LABEL], None),
+    ("ui.dialog.commands", "Command Reference", &["Help", "FisiCAD Help"], Some("F1")),
     ("ui.toggle.history", "Command History", &["Window", "Command History"], Some("F2")),
     ("ui.cmdline.lines", "Command Line History Lines", &[], None),
     ("ui.cmdline.clear", "Clear Command History", &[], None),
     ("ui.dialog.language", "Interface Language", &["Edit", "Interface Language"], None),
     ("ui.language", "Language", &[], None),
     ("ui.noop", "", &[], None),
-    ("ui.quit", "Quit CADCraft", &[], Some("Cmd+Q")),
+    ("ui.quit", "Quit FisiCAD", &[], Some("Cmd+Q")),
 ];
 
 pub fn is_ui_command(id: &str) -> bool {
@@ -246,15 +249,15 @@ fn run_ui_command_inner(app: &mut CadApp, id: &str, params: &Value) -> Option<Re
             toggle(&mut app.ui.in_window_menu, params);
             Ok(Value::Null)
         }
-        "ui.theme.system" | "ui.theme.light" | "ui.theme.dark" => {
+        "ui.theme.ufrgsNoite" | "ui.theme.ufrgsDia" | "ui.theme.system" | "ui.theme.light" | "ui.theme.dark" => {
             let pref = crate::theme::ThemePref::parse(id.trim_start_matches("ui.theme.")).unwrap_or_default();
             set_theme(app, pref)
         }
-        // `{"theme": "system"|"light"|"dark"}` sets the choice; without it, reports it.
+        // `{"theme": "ufrgsNoite"|"ufrgsDia"|"system"|"light"|"dark"}` sets the choice; without it, reports it.
         "ui.theme" => match params.get("theme").and_then(Value::as_str) {
             Some(name) => match crate::theme::ThemePref::parse(name) {
                 Some(pref) => set_theme(app, pref),
-                None => Err(format!("unknown theme \"{name}\" (system, light or dark)")),
+                None => Err(format!("unknown theme \"{name}\" (ufrgsNoite, ufrgsDia, system, light or dark)")),
             },
             None => Ok(theme_json(app)),
         },
@@ -343,6 +346,11 @@ fn run_ui_command_inner(app: &mut CadApp, id: &str, params: &Value) -> Option<Re
         | "ui.dialog.qselect"
         | "ui.dialog.parameters" => {
             app.ui.dialog = Some(id.trim_start_matches("ui.dialog.").to_string());
+            Ok(Value::Null)
+        }
+        // Help ▸ Sobre a Suíte FisiLab…: the brand's About window (opened on the next frame).
+        "ui.fisilab.about" => {
+            app.fisilab_about_requested = true;
             Ok(Value::Null)
         }
         "ui.dialog.close" => {

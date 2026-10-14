@@ -1,4 +1,4 @@
-//! The CADCraft egui front end.
+//! The FisiCAD egui front end (based on CADCraft's).
 //!
 //! A thin shell over [`cadcraft_engine::Session`]: panels read engine state and act through
 //! commands (`app.run(id, params)`) or the command line (`app.cmdline(text)`). Nothing here owns
@@ -57,6 +57,26 @@ use serde_json::{Value, json};
 
 pub use control::{ControlRequest, ControlResponse, PendingReply};
 
+/// What FisiCAD tells the Suíte FisiLab brand crate about itself (About window, splash).
+pub const APP_INFO: fisilab_brand::AppInfo = fisilab_brand::AppInfo {
+    name: "FisiCAD",
+    tagline: "Desenho técnico e CAD",
+    equivalent: "Autodesk AutoCAD",
+    version: env!("CARGO_PKG_VERSION"),
+    upstream_name: "CADCraft",
+    upstream_url: "https://github.com/storytold/cadcraft",
+    upstream_copyright: "© 2026 ArtCraft Team e contribuidores do CADCraft",
+};
+
+/// The interface language of a fresh install (no saved preferences): Brazilian Portuguese. The
+/// desktop app applies it when it finds no saved preferences; a saved choice (including "auto")
+/// is kept.
+pub const FIRST_RUN_LANGUAGE: i18n::Preference = i18n::Preference::BrazilianPortuguese;
+
+/// Suíte FisiLab links (Help ▸ About FisiCAD).
+pub const UPSTREAM_URL: &str = "https://github.com/storytold/cadcraft";
+pub const ISSUES_URL: &str = "https://github.com/mrcandrade/fisicad/issues";
+
 /// The host storage key for [`CadApp::prefs_json`].
 pub const PREFS_KEY: &str = "cadcraft.prefs";
 
@@ -96,7 +116,8 @@ pub struct UiState {
     pub start_tab: bool,
     pub dialog: Option<String>,
     pub history_lines: usize,
-    /// Interface theme: "system" (follow the OS light/dark appearance), "light" or "dark".
+    /// Interface theme: "ufrgsNoite" (the default), "ufrgsDia", "system" (follow the OS
+    /// light/dark appearance), "light" or "dark".
     pub theme: theme::ThemePref,
     /// Animation effects (dialog and menu fades, smoothed scrolling): "system" (follow the OS
     /// setting), "on" or "off".
@@ -218,8 +239,10 @@ pub struct CadApp {
     pub frame_cap: Option<gpu::FrameCap>,
     /// Language whose interface fonts are installed (`None` until the first frame).
     fonts_language: Option<&'static str>,
-    /// The theme last installed into egui (`None` until the first frame).
-    shown_theme: Option<egui::Theme>,
+    /// The palette last installed into egui (`None` until the first frame).
+    shown_theme: Option<theme::Palette>,
+    /// Help ▸ Sobre a Suíte FisiLab… was chosen: the brand's About window opens on the next frame.
+    pub fisilab_about_requested: bool,
     /// Whether the last applied theme was handed to egui as the System preference.
     shown_follows_system: bool,
     /// Whether egui was last told to animate (`None` until the first frame).
@@ -269,6 +292,7 @@ impl CadApp {
             frame_cap: None,
             fonts_language: None,
             shown_theme: None,
+            fisilab_about_requested: false,
             shown_follows_system: false,
             shown_animations: None,
             frame_ms: 0.0,
@@ -352,7 +376,12 @@ impl CadApp {
 
     /// The theme the interface shows now (the choice resolved against the OS appearance).
     pub fn shown_theme(&self) -> egui::Theme {
-        self.shown_theme.unwrap_or_else(|| self.ui.theme.resolve(None))
+        self.shown_palette().theme()
+    }
+
+    /// The palette the interface shows now (the choice resolved against the OS appearance).
+    pub fn shown_palette(&self) -> theme::Palette {
+        self.shown_theme.unwrap_or_else(|| self.ui.theme.palette(None))
     }
 
     /// Whether the interface shows animation effects now (the choice resolved against the OS
@@ -464,7 +493,7 @@ impl CadApp {
     pub fn open_size_error(name: &str, len: u64) -> Option<String> {
         (len > Self::MAX_OPEN_BYTES).then(|| {
             format!(
-                "Open: {name} is {:.1} MB, larger than the {} MB CADCraft opens in the browser",
+                "Open: {name} is {:.1} MB, larger than the {} MB FisiCAD opens in the browser",
                 len as f64 / 1048576.0,
                 Self::MAX_OPEN_BYTES >> 20
             )
@@ -543,7 +572,7 @@ impl CadApp {
         }
         // Resolved every frame, so a System choice follows the OS appearance live (winit and the
         // browser report changes as input); the saved choice itself never changes here.
-        let shown = self.ui.theme.resolve(ctx.system_theme());
+        let shown = self.ui.theme.palette(ctx.system_theme());
         theme::set_active(shown);
         theme::set_canvas(self.options.canvas());
         let follows_system = self.ui.theme == theme::ThemePref::System;
@@ -612,6 +641,12 @@ impl CadApp {
     /// Lay out the whole window.
     pub fn ui(&mut self, ui: &mut egui::Ui) {
         i18n::with_language(self.language(), || self.draw(ui));
+        // The Suíte FisiLab About window and opening splash, on top of everything, every frame
+        // (the fonts were installed by `logic`).
+        if std::mem::take(&mut self.fisilab_about_requested) {
+            fisilab_brand::about::open(ui.ctx());
+        }
+        fisilab_brand::frame(ui.ctx(), &APP_INFO);
     }
 
     fn draw(&mut self, ui: &mut egui::Ui) {
@@ -761,7 +796,17 @@ mod tests {
     #[test]
     fn theme_choice_persists_and_drives_tokens() {
         let mut a = app();
-        assert_eq!(a.ui.theme, ThemePref::Dark, "default keeps today's look");
+        assert_eq!(a.ui.theme, ThemePref::UfrgsNoite, "UFRGS Noite is the default");
+        let ctx = egui::Context::default();
+        frame(&mut a, &ctx, Some(egui::Theme::Light));
+        assert_eq!(Tokens::get(), Tokens::NOITE);
+        assert_eq!(ctx.theme(), egui::Theme::Dark);
+        assert_eq!(a.run("ui.theme", json!({ "theme": "ufrgsDia" })).ok(), Some(json!({ "theme": "ufrgsDia", "shown": "light" })));
+        frame(&mut a, &ctx, Some(egui::Theme::Dark));
+        assert_eq!(Tokens::get(), Tokens::DIA);
+        assert_eq!(ctx.theme(), egui::Theme::Light);
+        a.start("ui.theme.ufrgsNoite");
+        assert_eq!(a.ui.theme, ThemePref::UfrgsNoite);
         assert!(a.run("ui.theme", json!({ "theme": "Purple" })).is_err());
         assert_eq!(a.run("ui.theme", json!({ "theme": "light" })).ok(), Some(json!({ "theme": "light", "shown": "light" })));
         // Saved and restored by the host.

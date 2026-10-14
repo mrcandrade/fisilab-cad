@@ -1,0 +1,81 @@
+# Modificações do FisiCAD em relação ao CADCraft
+
+O FisiCAD é uma versão modificada do [CADCraft](https://github.com/storytold/cadcraft) (versão
+0.7.0, commit "Release 0.7.0"), feita para a Suíte FisiLab pelo FisiLab — LARFIC/UFRGS em parceria
+com o CTA — Centro de Tecnologia Acadêmica. As modificações são © 2026 FisiLab — LARFIC/UFRGS e
+seguem os mesmos termos do original (MIT OR Apache-2.0).
+
+## O que mudou e por quê
+
+### Nome e marca
+- O nome exibido ao usuário passou de **CADCraft** para **FisiCAD**: título da janela, nome do app
+  no `eframe`, menus ("Sobre o FisiCAD", "Ajuda do FisiCAD", "Sair do FisiCAD"), página inicial,
+  diálogos, mensagens de status e de erro (motor, leitura de DXF/DWG, servidor MCP), `--help` e
+  `--version` da linha de comando e os catálogos de tradução (`crates/ui-egui/src/i18n/*.tsv`,
+  chaves e valores).
+- O nome e as logos da ArtCraft são marcas que não fazem parte da licença livre. Por isso a pasta
+  `docs/brand/` foi apagada e o app não mostra mais nenhuma logo ou marca da ArtCraft. O crédito em
+  texto ("baseado no CADCraft, da equipe ArtCraft e contribuidores") continua, como manda a licença.
+
+### Identidade da Suíte FisiLab
+- Novo crate `crates/fisilab-brand` (cópia do crate compartilhado da suíte): paleta de cores,
+  animação de abertura com a logo do CTA e a janela "Sobre a Suíte FisiLab".
+- `crates/ui-egui/src/lib.rs`: `APP_INFO` (nome, descrição, equivalente proprietário e créditos
+  ao projeto de origem); `CadApp::ui` chama `fisilab_brand::frame` em todo quadro.
+- `apps/cadcraft/src/main.rs`: `fisilab_brand::splash::enable()` antes de abrir a janela.
+- Menu **Ajuda ▸ Sobre a Suíte FisiLab…** (comando `ui.fisilab.about`), também no menu do app no
+  macOS. A janela "Sobre o FisiCAD" original continua (com os contribuidores do CADCraft) e ganhou
+  os créditos da suíte e os links abaixo.
+
+### Temas "UFRGS Noite" e "UFRGS Dia"
+- `crates/ui-egui/src/theme.rs`: dois temas novos, feitos com as cores da marca
+  (`fisilab_brand::palette::NOITE` e `DIA`), primeiros da lista. **UFRGS Noite é o padrão.** Os
+  temas originais (Usar configuração do sistema, Claro, Escuro) continuam disponíveis.
+- A área de desenho (espaço do modelo) usa o fundo mais escuro da marca nos dois temas, com grade
+  e eixos derivados dele; as cores de desenho CAD (seleção, grips, snaps, cursor, papel) são as do
+  original, pois codificam informação do desenho.
+- Novo token `accent_text` (texto sobre o botão de destaque), para manter contraste no tema claro.
+- Testes novos: tema padrão, nomes dos temas, origem das cores, contraste de texto em todos os
+  temas e instalação dos estilos no `egui`.
+
+### Links da comunidade
+- Removidos os links para o Discord da ArtCraft e para getartcraft.com (janela Sobre, menu do macOS,
+  instalador MSI, metadados de pacotes Linux). No lugar: "Site da Suíte FisiLab", "Manifesto pelas
+  tecnologias livres", "Projeto original (CADCraft)" e "Reportar um problema"
+  (https://github.com/mrcandrade/fisicad/issues), além do botão "Sobre a Suíte FisiLab…".
+- O CADCraft não faz verificação de atualizações, telemetria, envio de falhas nem downloads de
+  servidores da ArtCraft; não houve nada a desativar além dos links acima.
+
+### Idioma
+- Numa instalação nova (sem preferências salvas) o FisiCAD abre em **português do Brasil**
+  (`FIRST_RUN_LANGUAGE`). A escolha do usuário, inclusive "Automático", é salva e respeitada.
+
+### Executáveis, identificador e pastas
+- Executáveis: `fisicad.exe` (programa) e `fisicad-cli.exe` (linha de comando), por `[[bin]]`
+  explícitos; os pacotes Rust mantêm os nomes `cadcraft` e `cadcraft-cli`.
+- Identificador do app: `br.ufrgs.fisilab.fisicad` (era `ai.storyteller.cadcraft`).
+- Pastas de configuração, logs, autosave e plotters: `%APPDATA%\FisiCAD`,
+  `~/Library/Application Support/FisiCAD`, `~/.config/fisicad`, para não misturar com uma instalação
+  do CADCraft.
+- Recursos do Windows (`apps/cadcraft/build.rs`): ícone `assets/fisilab/fisicad.ico`, nome,
+  descrição, empresa e copyright do FisiCAD. Ícone da janela: `assets/fisilab/fisicad-256.png`.
+- `packaging/windows/*`: nomes, GUIDs novos (não substituem uma instalação do CADCraft), ProgId
+  `FisiLab.FisiCAD.Drawing`, links e ícone atualizados.
+
+### Outros
+- `.github/` apagado (os fluxos de CI e de release do original rodariam contra este fork).
+- `README.md` novo em português; o original está em `README.upstream.md`.
+- `NOTICE` ganhou um cabeçalho do FisiCAD; o texto original segue abaixo dele, sem alterações.
+
+## O que não mudou
+- Identificadores internos: nomes de crates e módulos Rust, ids de comandos, chaves de preferências,
+  variáveis de ambiente `CADCRAFT_*` e nomes de arquivos de log.
+- Formatos e nomes gravados em arquivos, por compatibilidade: a fonte "CADCraft Stroke", os
+  dispositivos de plotagem "CADCraft PDF/PNG/SVG" e os marcadores dos arquivos de estilos de
+  plotagem e de plotters.
+- Comentários, documentação técnica em `docs/`, histórico, `CLAUDE.md`/`AGENTS.md`, `ROADMAP.md`.
+- `LICENSE-MIT`, `LICENSE-APACHE` e `ATTRIBUTION.md` (este ainda lista os arquivos de
+  `docs/brand/`, que foram apagados; nenhum material de terceiros foi adicionado).
+- O ícone original do CADCraft em `assets/app-icon/` (usado só pelos scripts de pacote de macOS e
+  Linux, que não foram adaptados) e o app web (`apps/cadcraft-web`), que só teve o nome trocado.
+- Todo o resto do comportamento do CADCraft.

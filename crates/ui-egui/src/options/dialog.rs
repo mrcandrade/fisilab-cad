@@ -95,6 +95,9 @@ fn hint(ui: &mut egui::Ui, text: &str) {
 
 fn theme_label(t: ThemePref) -> &'static str {
     match t {
+        // Proper names of the Suíte FisiLab themes: not translated.
+        ThemePref::UfrgsNoite => "UFRGS Noite",
+        ThemePref::UfrgsDia => "UFRGS Dia",
         ThemePref::System => crate::tl!("Use System Setting"),
         ThemePref::Light => crate::tl!("Light"),
         ThemePref::Dark => crate::tl!("Dark"),
@@ -162,11 +165,11 @@ fn display(app: &CadApp, ui: &mut egui::Ui, changes: &mut Map<String, Value>) {
         ui.end_row();
 
         ui.label(crate::tl!("Model background"));
-        color_row(ui, app.options.model_background, Tokens::DARK.canvas, "modelBackground", changes);
+        color_row(ui, app.options.model_background, crate::theme::active_palette().tokens().canvas, "modelBackground", changes);
         ui.end_row();
 
         ui.label(crate::tl!("Layout paper"));
-        color_row(ui, app.options.paper_background, Tokens::DARK.paper, "paperBackground", changes);
+        color_row(ui, app.options.paper_background, crate::theme::active_palette().tokens().paper, "paperBackground", changes);
         ui.end_row();
 
         ui.label(crate::tl!("Crosshair size"));
@@ -317,7 +320,7 @@ fn selection(app: &CadApp, ui: &mut egui::Ui, changes: &mut Map<String, Value>) 
         }
         left.add_space(4.0);
         left.label(crate::tl!("Selection effect color"));
-        color_row(left, app.options.selection_color, crate::theme::Tokens::of(crate::theme::active()).selection, "selectionColor", changes);
+        color_row(left, app.options.selection_color, crate::theme::active_palette().tokens().selection, "selectionColor", changes);
 
         // Right: grips and the preview under the cursor.
         heading(right, crate::tl!("Grip size"));
@@ -473,7 +476,7 @@ fn preferences(app: &CadApp, ui: &mut egui::Ui, changes: &mut Map<String, Value>
 
 fn profiles(app: &CadApp, ui: &mut egui::Ui, changes: &mut Map<String, Value>) {
     ui.label(crate::tl!(
-        "CADCraft keeps these preferences, object snap modes and drafting toggles for your user account and restores them when it starts."
+        "FisiCAD keeps these preferences, object snap modes and drafting toggles for your user account and restores them when it starts."
     ));
     ui.add_space(8.0);
     ui.horizontal(|ui| {

@@ -300,8 +300,8 @@ fn units(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) {
 fn about(ctx: &egui::Context, open: &mut bool) {
     let t = Tokens::get();
     let tab_id = egui::Id::new("about_tab");
-    egui::Window::new(crate::tl!("About CADCraft"))
-        .id(egui::Id::new("About CADCraft"))
+    egui::Window::new(crate::tl!("About FisiCAD"))
+        .id(egui::Id::new("About FisiCAD"))
         .open(open)
         .default_size(vec2(640.0, 420.0))
         .collapsible(false)
@@ -320,13 +320,28 @@ fn about(ctx: &egui::Context, open: &mut bool) {
                 1 => crate::credits::contributors_ui(ui),
                 2 => crate::credits::models_ui(ui),
                 _ => {
-                    ui.heading(crate::tl!("CADCraft"));
+                    ui.heading(crate::tl!("FisiCAD"));
                     ui.label(crate::tf!("Version {version}", version = env!("CARGO_PKG_VERSION")));
                     ui.label(crate::tl!("Computer-aided design and drafting: an open-source, clean-room CAD application written in pure Rust."));
                     ui.add_space(6.0);
-                    ui.label(RichText::new(crate::tl!("One of the Crafting Apps by the ArtCraft team and community.")).color(t.text_dim));
-                    ui.hyperlink_to("getartcraft.com/apps/cadcraft", "https://getartcraft.com/apps/cadcraft");
-                    ui.hyperlink_to(crate::tl!("Join us on Discord"), "https://discord.gg/artcraft");
+                    // Suíte FisiLab credits and links (pt-BR, the suite's language).
+                    ui.label(
+                        RichText::new(format!(
+                            "Parte da {}, disponibilizada pelo {} em parceria com o {}. {} Baseado no CADCraft, da equipe ArtCraft e contribuidores.",
+                            fisilab_brand::SUITE,
+                            fisilab_brand::LAB,
+                            fisilab_brand::PARTNER,
+                            fisilab_brand::AUDIENCE,
+                        ))
+                        .color(t.text_dim),
+                    );
+                    ui.hyperlink_to("Site da Suíte FisiLab", fisilab_brand::SUITE_URL);
+                    ui.hyperlink_to("Manifesto pelas tecnologias livres", fisilab_brand::MANIFESTO_URL);
+                    ui.hyperlink_to("Projeto original (CADCraft)", crate::UPSTREAM_URL);
+                    ui.hyperlink_to("Reportar um problema", crate::ISSUES_URL);
+                    if ui.button(fisilab_brand::ABOUT_MENU_LABEL).clicked() {
+                        fisilab_brand::about::open(ui.ctx());
+                    }
                     ui.add_space(6.0);
                     ui.label(RichText::new(crate::tl!("MIT OR Apache-2.0. Not affiliated with Autodesk, Inc.")).small().color(t.text_faint));
                 }

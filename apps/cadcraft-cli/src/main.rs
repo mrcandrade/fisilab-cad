@@ -51,19 +51,24 @@ fn stdout_failed(e: std::io::Error) {
     if STDOUT_GONE.swap(true, Ordering::Relaxed) || e.kind() == std::io::ErrorKind::BrokenPipe {
         return;
     }
-    eprintln!("cadcraft-cli: can't write to stdout: {e}");
+    eprintln!("fisicad-cli: can't write to stdout: {e}");
     STDOUT_ERROR.store(true, Ordering::Relaxed);
 }
 
+/// The first lines of `--help`.
+const HELP_HEADER: &str = "fisicad-cli — FisiCAD, desenho técnico e CAD (Suíte FisiLab · FisiLab — LARFIC/UFRGS, em parceria com o CTA)
+Ferramenta de linha de comando: informações, conversão, scripts, exportação, comandos e servidor MCP.
+Baseado no CADCraft (https://github.com/storytold/cadcraft), da equipe ArtCraft e contribuidores.";
+
 const USAGE: &str = "usage:
-  cadcraft-cli info FILE.dxf
-  cadcraft-cli convert IN.dxf OUT.(dxf|dwg|svg|png|pdf) [FRAMING]
-  cadcraft-cli run [FILE | --sample | --metric] [--script TEXT] [--script-file F.scr] [--cmd 'id {json}']... [--save OUT.dxf] [--export OUT.(png|svg|pdf)] [FRAMING]
-  cadcraft-cli commands [FILTER]
-  cadcraft-cli mcp [--connect HOST:PORT [--lazy] [--launch]]
-  cadcraft-cli perf [N | FILE]
-  cadcraft-cli sample (bracket|floorplan) OUT.(dxf|dwg|svg|png)
-  cadcraft-cli --version
+  fisicad-cli info FILE.dxf
+  fisicad-cli convert IN.dxf OUT.(dxf|dwg|svg|png|pdf) [FRAMING]
+  fisicad-cli run [FILE | --sample | --metric] [--script TEXT] [--script-file F.scr] [--cmd 'id {json}']... [--save OUT.dxf] [--export OUT.(png|svg|pdf)] [FRAMING]
+  fisicad-cli commands [FILTER]
+  fisicad-cli mcp [--connect HOST:PORT [--lazy] [--launch]]
+  fisicad-cli perf [N | FILE]
+  fisicad-cli sample (bracket|floorplan) OUT.(dxf|dwg|svg|png)
+  fisicad-cli --version
 
 image framing (png 2400x1600, svg, pdf; always model space):
   default                  convert: fit the drawing extents.
@@ -585,7 +590,7 @@ fn mcp(args: &[String]) -> Result<(), String> {
         McpTarget::Connect { addr, lazy: true, launch } => Box::new(cadcraft_mcp::Remote::lazy(&addr, launch)),
         McpTarget::Connect { addr, .. } => match cadcraft_mcp::Remote::connect(&addr) {
             Ok(r) => Box::new(r),
-            Err(e) => return Err(format!("cadcraft-cli: cannot connect to {addr}: {e}")),
+            Err(e) => return Err(format!("fisicad-cli: cannot connect to {addr}: {e}")),
         },
         McpTarget::Headless => Box::new(cadcraft_mcp::Headless::default()),
     };
@@ -663,7 +668,13 @@ fn cli() -> ExitCode {
         }),
         Some("mcp") => mcp(&rest),
         Some("--version" | "-V") => {
-            outln!("cadcraft-cli {}", env!("CARGO_PKG_VERSION"));
+            outln!("fisicad-cli {} (FisiCAD — Desenho técnico e CAD, Suíte FisiLab; baseado no CADCraft)", env!("CARGO_PKG_VERSION"));
+            Ok(())
+        }
+        Some("--help" | "-h" | "help") => {
+            outln!("{HELP_HEADER}
+
+{USAGE}");
             Ok(())
         }
         _ => Err(USAGE.into()),
