@@ -70,6 +70,7 @@ seguem os mesmos termos do original (MIT OR Apache-2.0).
   `warn,cadcraft*=info,fisilab_cad=info`.
 - `fisilab-cad-cli mcp --connect … --launch` no macOS abre o app pelo identificador do pacote
   (`open -b br.ufrgs.fisilab.cad`).
+- `packaging/macos/*`: o empacotamento do macOS (DMG universal) usa os nomes, o ícone e os identificadores do CAD (`CAD.app`, `FisiLab-CAD-<versão>-macOS.dmg`, `br.ufrgs.fisilab.cad`).
 
 ### Outros
 - `.github/` apagado (os fluxos de CI e de release do original rodariam contra este fork).

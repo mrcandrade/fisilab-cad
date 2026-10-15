@@ -52,6 +52,10 @@ Baixe o instalador `FisiLab-CAD-Setup-<versão>.exe` na [página de downloads da
 
 Baixe `FisiLab-CAD-<versão>-x86_64.AppImage` na [página de downloads da Suíte FisiLab](https://github.com/mrcandrade/larfic/releases/latest), marque-o como executável (`chmod +x` ou Propriedades › Permitir executar) e abra-o; ou instale o `fisilab-cad_<versão>_amd64.deb` no Ubuntu/Debian (`sudo apt install ./fisilab-cad_<versão>_amd64.deb`). Requer Ubuntu 22.04 ou mais recente (ou equivalente).
 
+### macOS
+
+macOS 11 ou mais novo (Intel ou Apple Silicon). Baixe `FisiLab-CAD-<versão>-macOS.dmg` em https://github.com/mrcandrade/larfic/releases/latest, abra-o e arraste o CAD para a pasta Aplicativos. Na primeira vez o macOS avisa que não pode verificar o desenvolvedor (o programa ainda não tem assinatura paga da Apple): abra **Ajustes do Sistema › Privacidade e Segurança** e clique em **Abrir Mesmo Assim** (no macOS 14 ou anterior também funciona clicar com o botão direito no app › **Abrir**).
+
 ### Compilar a partir do código
 
 É preciso ter o [Rust](https://rustup.rs) 1.95 ou mais recente.
