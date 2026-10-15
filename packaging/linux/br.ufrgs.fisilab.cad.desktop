@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=CAD
+GenericName=Desenho técnico e CAD
+Comment=Desenho técnico e CAD — Suíte FisiLab (alternativa livre)
+Exec=fisilab-cad %F
+TryExec=fisilab-cad
+Icon=br.ufrgs.fisilab.cad
+Terminal=false
+StartupNotify=true
+StartupWMClass=br.ufrgs.fisilab.cad
+Categories=Graphics;Engineering;VectorGraphics;
+MimeType=image/vnd.dxf;image/vnd.dwg;application/x-dxf;application/acad;
+Keywords=cad;drafting;dxf;dwg;drawing;engineering;architecture;mechanical;desenho;projeto;engenharia;arquitetura;

@@ -48,6 +48,10 @@ fluxo de trabalho do AutoCAD.
 Baixe o instalador `FisiLab-CAD-Setup-<versão>.exe` na [página de downloads da Suíte FisiLab](https://github.com/mrcandrade/larfic/releases/latest) e execute-o. O CAD abre em português do Brasil na primeira execução, com a paleta original no tema
 **Noite**; o idioma e o tema (**Dia** ou o do sistema) podem ser trocados no menu e nas Opções.
 
+### Linux
+
+Baixe `FisiLab-CAD-<versão>-x86_64.AppImage` na [página de downloads da Suíte FisiLab](https://github.com/mrcandrade/larfic/releases/latest), marque-o como executável (`chmod +x` ou Propriedades › Permitir executar) e abra-o; ou instale o `fisilab-cad_<versão>_amd64.deb` no Ubuntu/Debian (`sudo apt install ./fisilab-cad_<versão>_amd64.deb`). Requer Ubuntu 22.04 ou mais recente (ou equivalente).
+
 ### Compilar a partir do código
 
 É preciso ter o [Rust](https://rustup.rs) 1.95 ou mais recente.

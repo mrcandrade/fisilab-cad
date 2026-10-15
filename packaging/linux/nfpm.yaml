@@ -3,7 +3,7 @@
 # exports VERSION and NFPM_ARCH.
 #
 #   nfpm package -f packaging/linux/nfpm.yaml -p deb -t dist/release/
-name: cadcraft
+name: fisilab-cad
 arch: ${NFPM_ARCH}
 platform: linux
 version: ${VERSION}
@@ -13,14 +13,15 @@ release: 1
 section: graphics
 priority: optional
 maintainer: ${CADCRAFT_MAINTAINER}
-vendor: Learning Machines LLC
-homepage: https://github.com/mrcandrade/fisilab-cad
+vendor: FisiLab - LARFIC/UFRGS
+homepage: https://github.com/mrcandrade/larfic
 license: MIT OR Apache-2.0
 description: |-
-  Open-source computer-aided design and drafting: draft, dimension and plot 2D
-  drawings with a familiar command line, object snaps, layers, dimensions, hatches
-  and blocks. Opens and saves DXF and DWG; exports SVG and PNG.
-  Includes cadcraft-cli, a headless converter and command runner.
+  CAD: desenho técnico assistido por computador, livre, da Suíte FisiLab. Desenhe, cote e
+  plote desenhos 2D com linha de comando, snaps, camadas, cotas, hachuras e blocos. Abre e
+  salva DXF e DWG; exporta SVG e PNG. Inclui o fisilab-cad-cli, conversor e executor de
+  comandos sem interface. Baseado no CADCraft, do ArtCraft Team e contribuidores
+  (MIT ou Apache 2.0).
 
 # The binaries link only glibc and libgcc_s directly. Windowing (X11/Wayland, xkbcommon) and the
 # GPU (Vulkan, EGL/GL) are loaded at runtime, so they are dependencies/recommendations here
@@ -55,11 +56,11 @@ overrides:
       - xdg-desktop-portal
 
 contents:
-  - src: ${STAGE}/usr/bin/cadcraft
-    dst: /usr/bin/cadcraft
+  - src: ${STAGE}/usr/bin/fisilab-cad
+    dst: /usr/bin/fisilab-cad
     file_info: { mode: 0755 }
-  - src: ${STAGE}/usr/bin/cadcraft-cli
-    dst: /usr/bin/cadcraft-cli
+  - src: ${STAGE}/usr/bin/fisilab-cad-cli
+    dst: /usr/bin/fisilab-cad-cli
     file_info: { mode: 0755 }
   - src: ${STAGE}/usr/share/
     dst: /usr/share/

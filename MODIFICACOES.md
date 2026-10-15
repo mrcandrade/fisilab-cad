@@ -20,6 +20,7 @@ seguem os mesmos termos do original (MIT OR Apache-2.0).
 - O nome e as logos da ArtCraft são marcas que não fazem parte da licença livre. Por isso a pasta
   `docs/brand/` foi apagada e o app não mostra mais nenhuma logo ou marca da ArtCraft. O crédito em
   texto ("baseado no CADCraft, da equipe ArtCraft e contribuidores") continua, como manda a licença.
+- O empacotamento Linux (AppImage e .deb) usa os nomes, ícones e ids da suíte (`FisiLab-CAD-<versão>-x86_64.AppImage`, `fisilab-cad_<versão>_amd64.deb`, id `br.ufrgs.fisilab.cad`).
 
 ### Identidade da Suíte FisiLab
 - Novo crate `crates/fisilab-brand` (cópia do crate compartilhado da suíte): paleta de cores,

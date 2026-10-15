@@ -2,44 +2,39 @@
 <!-- AppStream metadata (software centres, Flathub). Template: package.sh and the Flatpak
      manifest substitute @VERSION@ and @DATE@ from Cargo.toml and the build date. -->
 <component type="desktop-application">
-  <id>ai.storyteller.cadcraft</id>
+  <id>br.ufrgs.fisilab.cad</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT OR Apache-2.0</project_license>
-  <name>CADCraft</name>
-  <summary>Draft, dimension and plot 2D drawings</summary>
-  <developer id="ai.storyteller">
-    <name>Learning Machines LLC</name>
+  <name>CAD</name>
+  <summary>Desenho técnico e CAD</summary>
+  <developer id="br.ufrgs.fisilab">
+    <name>FisiLab — LARFIC</name>
   </developer>
   <description>
     <p>
-      CADCraft is an open-source computer-aided design and drafting application with a familiar
-      command line, object snaps, layers, dimensions, hatches and blocks. It opens and saves DXF
-      and DWG drawings, exports SVG and PNG, and can be driven by AI agents over MCP.
+      O CAD é um aplicativo livre de desenho técnico assistido por computador, com linha de
+      comando, snaps a objetos, camadas, cotas, hachuras e blocos. Abre e salva desenhos DXF e
+      DWG e exporta SVG e PNG. Faz parte da Suíte FisiLab (alternativa livre).
+    </p>
+    <p>
+      Baseado no CADCraft, do ArtCraft Team e contribuidores (MIT ou Apache 2.0).
     </p>
   </description>
-  <launchable type="desktop-id">ai.storyteller.cadcraft.desktop</launchable>
-  <icon type="stock">ai.storyteller.cadcraft</icon>
+  <launchable type="desktop-id">br.ufrgs.fisilab.cad.desktop</launchable>
+  <icon type="stock">br.ufrgs.fisilab.cad</icon>
   <!-- Only url types known to appstream 0.15 (Ubuntu 22.04, where CI validates): no vcs-browser. -->
-  <url type="homepage">https://github.com/mrcandrade/fisilab-cad</url>
-  <url type="bugtracker">https://github.com/storytold/cadcraft/issues</url>
-  <url type="help">https://github.com/storytold/cadcraft</url>
-  <url type="contact">https://github.com/mrcandrade/fisilab-cad/issues</url>
+  <url type="homepage">https://github.com/mrcandrade/larfic</url>
+  <url type="bugtracker">https://github.com/mrcandrade/fisilab-cad/issues</url>
   <categories>
     <category>Graphics</category>
     <category>Engineering</category>
   </categories>
   <keywords>
     <keyword>CAD</keyword>
-    <keyword>drafting</keyword>
+    <keyword>desenho técnico</keyword>
     <keyword>DXF</keyword>
     <keyword>DWG</keyword>
   </keywords>
-  <screenshots>
-    <screenshot type="default">
-      <caption>A mechanical part drawing with dimensions, hatching and layers</caption>
-      <image>https://raw.githubusercontent.com/storytold/cadcraft/main/docs/images/ui-bracket.png</image>
-    </screenshot>
-  </screenshots>
   <branding>
     <color type="primary" scheme_preference="light">#9ee3f2</color>
     <color type="primary" scheme_preference="dark">#0b6f88</color>
@@ -53,7 +48,7 @@
     <control>tablet</control>
   </supports>
   <provides>
-    <binary>cadcraft</binary>
+    <binary>fisilab-cad</binary>
   </provides>
   <content_rating type="oars-1.1"/>
   <releases>
