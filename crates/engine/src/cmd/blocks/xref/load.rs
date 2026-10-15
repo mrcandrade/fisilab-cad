@@ -138,6 +138,25 @@ fn canonical(p: &Path) -> PathBuf {
     p.to_path_buf()
 }
 
+/// Whether `path`, as stored in a drawing, points off this machine: a UNC share (`\\host\share`,
+/// `//host/share`), a device or `\\?\` path, an NT `\??\` path, or a URL (`file://host/..`, `http:`).
+/// Opening one on Windows starts an SMB connection that leaks the user's NTLM hash and IP, so
+/// these are never opened on a drawing's say-so.
+pub(crate) fn is_remote(path: &str) -> bool {
+    let t = path.trim_matches(|c: char| c.is_whitespace() || c.is_control());
+    let mut it = t.chars();
+    let (a, b) = (it.next(), it.next());
+    let sep = |c: Option<char>| matches!(c, Some('\\' | '/'));
+    if (sep(a) && sep(b)) || t.starts_with("\\??\\") || t.starts_with("/??/") {
+        return true;
+    }
+    // `scheme:` followed by more than a drive letter's colon.
+    match t.find(':') {
+        Some(i) if i > 1 => t[..i].chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '+' | '-' | '.')),
+        _ => false,
+    }
+}
+
 /// Where to look for a referenced drawing saved as `path`: the path itself (a relative one against
 /// the host's folder), then its file name in the host's folder. Both separators work everywhere.
 fn candidates(path: &str, dir: Option<&Path>) -> Vec<PathBuf> {
@@ -156,7 +175,7 @@ fn candidates(path: &str, dir: Option<&Path>) -> Vec<PathBuf> {
 
 /// The file a referenced drawing saved as `path` is loaded from, if there is one.
 pub(crate) fn find(path: &str, dir: Option<&Path>) -> Option<PathBuf> {
-    if path.trim().is_empty() {
+    if path.trim().is_empty() || is_remote(path) {
         return None;
     }
     #[cfg(not(target_arch = "wasm32"))]
@@ -238,6 +257,9 @@ fn fetch(path: &str, dir: Option<&Path>, cx: &mut Ctx, depth: usize) -> Result<(
     let unresolved = |m: &str| (XrefStatus::Unresolved, m.to_string());
     if depth >= MAX_BLOCK_DEPTH {
         return Err(unresolved("xrefs are nested too deeply"));
+    }
+    if is_remote(path) {
+        return Err((XrefStatus::NotFound, format!("{path}: network, device and URL paths are not opened (file not found)")));
     }
     let Some(file) = find(path, dir) else {
         let why = if cfg!(target_arch = "wasm32") { "files are not available on the web" } else { "file not found" };
@@ -449,5 +471,32 @@ mod tests {
         assert!(has_prefix("SITE|Walls", "site|"));
         assert!(!has_prefix("SITE", "site|"));
         assert!(!has_prefix("é", "ab"));
+    }
+
+    #[test]
+    fn remote_and_device_paths_are_never_opened() {
+        for p in [
+            r"\\host\share\x.dxf",
+            "//host/share/x.dxf",
+            r"\/host/share/x.dxf",
+            r"/\host/share/x.dxf",
+            r"\\?\UNC\host\share\x.dxf",
+            r"\\.\pipe\x",
+            r"\??\UNC\host\share\x.dxf",
+            r"  \\host\share\x.dxf",
+            "file://host/share/x.dxf",
+            "FILE:////host/share/x.dxf",
+            "http://host/x.dxf",
+        ] {
+            assert!(is_remote(p), "{p}");
+            assert!(find(p, Some(Path::new("."))).is_none(), "{p}");
+        }
+    }
+
+    #[test]
+    fn local_paths_are_not_remote() {
+        for p in ["x.dxf", "sub/x.dxf", r"sub\x.dxf", "../x.dxf", r"C:\dir\x.dxf", "C:/dir/x.dxf", "/home/u/x.dxf", r"\dir\x.dxf"] {
+            assert!(!is_remote(p), "{p}");
+        }
     }
 }

@@ -368,7 +368,7 @@ fn run_xopen(s: &mut Session, p: &Value) -> Result<Value> {
     let path = b.xref_path.clone().ok_or_else(|| bad("xopen", format!("\"{name}\" is not an xref")))?;
     let host = host(s);
     let dir = host.as_deref().and_then(|h| std::path::Path::new(h).parent().map(std::path::Path::to_path_buf));
-    let file = load::find(&path, dir.as_deref()).ok_or_else(|| bad("xopen", format!("{path}: file not found")))?;
+    let file = load::find(&path, dir.as_deref()).ok_or_else(|| bad("xopen", format!("{path}: {}", if load::is_remote(&path) { "network, device and URL paths are not opened (file not found)" } else { "file not found" })))?;
     s.execute("open", &json!({ "path": file.to_string_lossy() }))
 }
 

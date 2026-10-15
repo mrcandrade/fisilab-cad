@@ -131,12 +131,12 @@ fn not_open(addr: &str, e: std::io::Error) -> std::io::Error {
     )
 }
 
-/// Open the app with the control port of `addr` (macOS: `open -b ai.storyteller.cadcraft`, the
+/// Open the app with the control port of `addr` (macOS: `open -b br.ufrgs.fisilab.cad`, the
 /// CFBundleIdentifier in packaging/macos/Info.plist.in; change both together).
 fn launch_app(addr: &str) -> std::io::Result<()> {
     let port = addr.rsplit(':').next().filter(|p| p.parse::<u16>().is_ok()).ok_or_else(|| std::io::Error::other(format!("no port in {addr}")))?;
     if cfg!(target_os = "macos") {
-        let ok = std::process::Command::new("open").args(["-b", "ai.storyteller.cadcraft", "--args", "--control", port]).status()?.success();
+        let ok = std::process::Command::new("open").args(["-b", "br.ufrgs.fisilab.cad", "--args", "--control", port]).status()?.success();
         if ok { Ok(()) } else { Err(std::io::Error::other("could not open FisiLab CAD (is it in Applications?)")) }
     } else {
         Err(std::io::Error::other(format!("FisiLab CAD is not running; start it with `fisilab-cad --control {port}`")))

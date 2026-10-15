@@ -68,8 +68,7 @@ seguem os mesmos termos do original (MIT OR Apache-2.0).
   `fisilab_cad`; o filtro padrão (`apps/cadcraft/src/logging.rs`) é
   `warn,cadcraft*=info,fisilab_cad=info`.
 - `fisilab-cad-cli mcp --connect … --launch` no macOS abre o app pelo identificador do pacote
-  (`open -b ai.storyteller.cadcraft`, o `CFBundleIdentifier` de `packaging/macos/Info.plist.in`,
-  que não foi adaptado).
+  (`open -b br.ufrgs.fisilab.cad`).
 
 ### Outros
 - `.github/` apagado (os fluxos de CI e de release do original rodariam contra este fork).
@@ -88,3 +87,7 @@ seguem os mesmos termos do original (MIT OR Apache-2.0).
 - O ícone original do CADCraft em `assets/app-icon/` (usado só pelos scripts de pacote de macOS e
   Linux, que não foram adaptados) e o app web (`apps/cadcraft-web`), que só teve o nome trocado.
 - Todo o resto do comportamento do CADCraft.
+
+## Segurança e privacidade
+- Xrefs com caminho de rede (UNC `\\host\share`, `//host/share`, `\\?\`, `\\.\`, `\??\`) ou URL (`file://host/...`, `http:`) vindos do desenho nunca são abertos: o xref aparece como não encontrado, com mensagem explicando. Isso evita que o Windows abra uma conexão SMB ao carregar o desenho e vaze o hash NTLM e o IP do usuário. Caminhos locais (absolutos e relativos) seguem funcionando. Fontes e imagens não seguem caminhos do desenho (fontes são buscadas só nas pastas do sistema).
+- `fisilab-cad-cli mcp --launch` no macOS agora abre o app por `br.ufrgs.fisilab.cad` (antes `ai.storyteller.cadcraft`).
