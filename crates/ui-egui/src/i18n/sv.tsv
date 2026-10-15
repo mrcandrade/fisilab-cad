@@ -34,7 +34,7 @@
 	A drawing opened from a file keeps that file's format.	En ritning som öppnats från en fil behåller filens format.
 	A variable name starts with a letter and has only letters, digits and _	Ett variabelnamn börjar med en bokstav och innehåller bara bokstäver, siffror och _
 	About	Om
-	About FisiCAD	Om FisiCAD
+	About CAD	Om CAD
 	Absolute	Absolut
 	Add Current Scale	Lägg till aktuell skala
 	Add Leader	Lägg till hänvisningslinje
@@ -109,9 +109,9 @@
 	ByBlock	Enligt block
 	ByColor	Enligt färg
 	ByLayer	Enligt lager
-	FisiCAD	FisiCAD
-	FisiCAD Help	Hjälp för FisiCAD
-	FisiCAD keeps these preferences, object snap modes and drafting toggles for your user account and restores them when it starts.	FisiCAD sparar de här inställningarna, objektfästena och ritlägena för ditt användarkonto och återställer dem när programmet startar.
+	CAD	CAD
+	CAD Help	Hjälp för CAD
+	CAD keeps these preferences, object snap modes and drafting toggles for your user account and restores them when it starts.	CAD sparar de här inställningarna, objektfästena och ritlägena för ditt användarkonto och återställer dem när programmet startar.
 	Cancel	Avbryt
 	Cartesian (x, y)	Kartesisk (x, y)
 	Center	Centrum
@@ -790,7 +790,7 @@
 	Quick Select Properties	Egenskaper för snabbmarkering
 	Quick Select...	Snabbmarkering...
 	QuickCalc	Snabbkalkyl
-	Quit FisiCAD	Avsluta FisiCAD
+	Quit CAD	Avsluta CAD
 	Radius	Radie
 	Raster Image	Rasterbild
 	Ray	Stråle
@@ -1211,7 +1211,7 @@
 @plural	{n} contributor	{n} bidragsgivare|{n} bidragsgivare
 	Drawing as bytes	Ritningen som byte
 	Services	Tjänster
-	Hide FisiCAD	Dölj FisiCAD
+	Hide CAD	Dölj CAD
 	Hide Others	Dölj övriga
 	Accessibility	Tillgänglighet
 	Show System Cursor	Visa systemets muspekare

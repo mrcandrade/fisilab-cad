@@ -36,8 +36,9 @@ pub const KEEP: usize = 2;
 pub const MAX_FILE_BYTES: u64 = 16 * 1024 * 1024;
 /// Records kept in memory until the log file is attached.
 pub const MAX_PENDING: usize = 512;
-/// The built-in filter when `RUST_LOG` is unset or empty.
-pub const DEFAULT_FILTER: &str = "warn,cadcraft*=info";
+/// The built-in filter when `RUST_LOG` is unset or empty. The desktop binary is `fisilab-cad`, so
+/// its own modules log under the `fisilab_cad` target; the library crates keep `cadcraft_*`.
+pub const DEFAULT_FILTER: &str = "warn,cadcraft*=info,fisilab_cad=info";
 
 /// Per-target level filter parsed from env_logger-style directives.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -312,6 +313,10 @@ mod tests {
         let f = Filter::parse(DEFAULT_FILTER);
         assert_eq!(f.level_for("cadcraft"), LevelFilter::Info);
         assert_eq!(f.level_for("cadcraft::control_server"), LevelFilter::Info);
+        // The desktop binary's own target (bin `fisilab-cad`).
+        assert_eq!(f.level_for("fisilab_cad"), LevelFilter::Info);
+        assert_eq!(f.level_for("fisilab_cad::control_server"), LevelFilter::Info);
+        assert_eq!(module_path!().split("::").next(), Some("fisilab_cad"));
         assert_eq!(f.level_for("cadcraft_ui_egui::gpu"), LevelFilter::Info);
         assert_eq!(f.level_for("cadcraft_engine"), LevelFilter::Info);
         assert_eq!(f.level_for("wgpu_core::device"), LevelFilter::Warn);

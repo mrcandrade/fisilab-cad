@@ -5,10 +5,10 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 publish = false
-default-run = "fisicad-cli"
+default-run = "fisilab-cad-cli"
 
 [[bin]]
-name = "fisicad-cli"
+name = "fisilab-cad-cli"
 path = "src/main.rs"
 
 [lints]

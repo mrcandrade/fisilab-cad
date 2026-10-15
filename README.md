@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/fisilab/fisicad-256.png" alt="Ícone do FisiCAD" width="128">
+  <img src="assets/fisilab/fisilab-cad-256.png" alt="Ícone do CAD" width="128">
 </p>
 
-<h1 align="center">FisiCAD</h1>
+<h1 align="center">CAD · Suíte FisiLab</h1>
 
 <p align="center">
   <b>Desenho técnico e CAD</b><br>
@@ -16,7 +16,7 @@
 
 ---
 
-O FisiCAD faz parte da [Suíte FisiLab](https://github.com/mrcandrade/larfic/tree/main/suite-fisilab):
+O CAD faz parte da [Suíte FisiLab](https://github.com/mrcandrade/larfic/tree/main/suite-fisilab):
 programas livres para ensino, pesquisa e criação. Ele é uma versão modificada do
 [CADCraft](https://github.com/storytold/cadcraft), uma reimplementação aberta e escrita em Rust do
 fluxo de trabalho do AutoCAD.
@@ -39,15 +39,15 @@ fluxo de trabalho do AutoCAD.
 - **Paramétrico:** restrições geométricas e dimensionais, AUTOCONSTRAIN e PARAMETERS com
   expressões.
 - **Automação:** servidor MCP, canal de controle JSON e a ferramenta de linha de comando
-  `fisicad-cli` (informações, conversão, scripts, exportação).
+  `fisilab-cad-cli` (informações, conversão, scripts, exportação).
 
 ## Instalação
 
 ### Windows
 
-Baixe o instalador `FisiCAD-Setup-<versão>.exe` no portal de downloads da Suíte FisiLab ou na
-página de [Releases do mrcandrade/fisicad](https://github.com/mrcandrade/fisicad/releases) e
-execute-o. O FisiCAD abre em português do Brasil e com o tema **UFRGS Noite**; o idioma e o tema
+Baixe o instalador `FisiLab-CAD-Setup-<versão>.exe` no portal de downloads da Suíte FisiLab ou na
+página de [Releases do mrcandrade/fisilab-cad](https://github.com/mrcandrade/fisilab-cad/releases) e
+execute-o. O CAD abre em português do Brasil e com o tema **UFRGS Noite**; o idioma e o tema
 (**UFRGS Dia**, Claro, Escuro ou o do sistema) podem ser trocados no menu e nas Opções.
 
 ### Compilar a partir do código
@@ -55,25 +55,25 @@ execute-o. O FisiCAD abre em português do Brasil e com o tema **UFRGS Noite**; 
 É preciso ter o [Rust](https://rustup.rs) 1.95 ou mais recente.
 
 ```sh
-git clone https://github.com/mrcandrade/fisicad
-cd fisicad
-cargo run --release -p cadcraft -- --sample   # abre o FisiCAD com um desenho de exemplo
+git clone https://github.com/mrcandrade/fisilab-cad
+cd fisilab-cad
+cargo run --release -p cadcraft -- --sample   # abre o CAD com um desenho de exemplo
 cargo build --release -p cadcraft -p cadcraft-cli
 ```
 
-Os executáveis ficam em `target/release/fisicad` (programa) e `target/release/fisicad-cli`
+Os executáveis ficam em `target/release/fisilab-cad` (programa) e `target/release/fisilab-cad-cli`
 (linha de comando). Os pacotes Rust mantêm os nomes originais (`cadcraft`, `cadcraft-cli`, ...).
 
 ## Créditos
 
-O FisiCAD é baseado no [CADCraft](https://github.com/storytold/cadcraft), criado pela equipe
+O CAD é baseado no [CADCraft](https://github.com/storytold/cadcraft), criado pela equipe
 ArtCraft e pelos contribuidores do CADCraft. O código é distribuído sob a licença MIT ou a
 Apache-2.0, à sua escolha ([LICENSE-MIT](LICENSE-MIT), [LICENSE-APACHE](LICENSE-APACHE)). Veja
 [NOTICE](NOTICE), [ATTRIBUTION.md](ATTRIBUTION.md), [MODIFICACOES.md](MODIFICACOES.md) (o que mudou
 nesta versão) e o [README original](README.upstream.md).
 
 Os nomes e as marcas do projeto original pertencem aos seus donos. Esta versão não é afiliada ao
-projeto original nem endossada por ele. AutoCAD e DWG são marcas da Autodesk, Inc.; o FisiCAD não
+projeto original nem endossada por ele. AutoCAD e DWG são marcas da Autodesk, Inc.; o CAD não
 tem relação com a Autodesk.
 
 ## Manifesto

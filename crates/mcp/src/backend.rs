@@ -60,7 +60,7 @@ impl Remote {
         Err(std::io::Error::new(
             std::io::ErrorKind::TimedOut,
             format!(
-                "FisiCAD was opened but its control port {} did not answer; if it was already open without the port, quit it and try again",
+                "FisiLab CAD was opened but its control port {} did not answer; if it was already open without the port, quit it and try again",
                 self.addr
             ),
         ))
@@ -126,19 +126,20 @@ fn not_open(addr: &str, e: std::io::Error) -> std::io::Error {
     std::io::Error::new(
         e.kind(),
         format!(
-            "FisiCAD is not answering at {addr} ({e}). Open FisiCAD with its control port (`--control PORT` or CADCRAFT_CONTROL_PORT), then try again"
+            "FisiLab CAD is not answering at {addr} ({e}). Open FisiLab CAD with its control port (`--control PORT` or CADCRAFT_CONTROL_PORT), then try again"
         ),
     )
 }
 
-/// Open the app with the control port of `addr` (macOS: `open -a CADCraft`).
+/// Open the app with the control port of `addr` (macOS: `open -b ai.storyteller.cadcraft`, the
+/// CFBundleIdentifier in packaging/macos/Info.plist.in; change both together).
 fn launch_app(addr: &str) -> std::io::Result<()> {
     let port = addr.rsplit(':').next().filter(|p| p.parse::<u16>().is_ok()).ok_or_else(|| std::io::Error::other(format!("no port in {addr}")))?;
     if cfg!(target_os = "macos") {
-        let ok = std::process::Command::new("open").args(["-a", "FisiCAD", "--args", "--control", port]).status()?.success();
-        if ok { Ok(()) } else { Err(std::io::Error::other("could not open FisiCAD (is it in Applications?)")) }
+        let ok = std::process::Command::new("open").args(["-b", "ai.storyteller.cadcraft", "--args", "--control", port]).status()?.success();
+        if ok { Ok(()) } else { Err(std::io::Error::other("could not open FisiLab CAD (is it in Applications?)")) }
     } else {
-        Err(std::io::Error::other(format!("FisiCAD is not running; start it with `fisicad --control {port}`")))
+        Err(std::io::Error::other(format!("FisiLab CAD is not running; start it with `fisilab-cad --control {port}`")))
     }
 }
 
@@ -167,10 +168,10 @@ impl Backend for Remote {
             Ok(r) => r,
             // Resend only when the request cannot have been applied. After a sent mutation with no reply the outcome is unknown, and
             // resending could apply it twice (for example two circles from one call), so report that instead.
-            Err((_, sent)) if !sent || is_read_only(method) => self.roundtrip(&line).map_err(|(e, _)| format!("FisiCAD at {}: {e}", self.addr))?,
+            Err((_, sent)) if !sent || is_read_only(method) => self.roundtrip(&line).map_err(|(e, _)| format!("FisiLab CAD at {}: {e}", self.addr))?,
             Err((e, _)) => {
                 return Err(format!(
-                    "FisiCAD at {}: {e}; the reply was lost, so `{method}` may or may not have been applied. Inspect the drawing first",
+                    "FisiLab CAD at {}: {e}; the reply was lost, so `{method}` may or may not have been applied. Inspect the drawing first",
                     self.addr
                 ));
             }
@@ -182,7 +183,7 @@ impl Backend for Remote {
             let e = v.get("error").and_then(Value::as_str).unwrap_or("error");
             // A timeout says whether the request can still have run (#345).
             Err(match v.get("state").and_then(Value::as_str) {
-                Some("not-run") => format!("{e}: FisiCAD did not start `{method}` and won't; it is safe to send again"),
+                Some("not-run") => format!("{e}: FisiLab CAD did not start `{method}` and won't; it is safe to send again"),
                 Some("may-have-run") => format!("{e}: `{method}` may or may not have been applied. Inspect the drawing first"),
                 _ => e.to_string(),
             })
@@ -192,7 +193,7 @@ impl Backend for Remote {
         true
     }
     fn describe(&self) -> String {
-        format!("connected to FisiCAD at {}", self.addr)
+        format!("connected to FisiLab CAD at {}", self.addr)
     }
 }
 
@@ -347,7 +348,7 @@ impl Backend for Headless {
         false
     }
     fn describe(&self) -> String {
-        "headless FisiCAD session".into()
+        "headless FisiLab CAD session".into()
     }
 }
 

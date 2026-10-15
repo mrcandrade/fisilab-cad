@@ -1,4 +1,4 @@
-//! The FisiCAD egui front end (based on CADCraft's).
+//! The CAD egui front end (based on CADCraft's).
 //!
 //! A thin shell over [`cadcraft_engine::Session`]: panels read engine state and act through
 //! commands (`app.run(id, params)`) or the command line (`app.cmdline(text)`). Nothing here owns
@@ -57,9 +57,9 @@ use serde_json::{Value, json};
 
 pub use control::{ControlRequest, ControlResponse, PendingReply};
 
-/// What FisiCAD tells the Suíte FisiLab brand crate about itself (About window, splash).
+/// What CAD tells the Suíte FisiLab brand crate about itself (About window, splash).
 pub const APP_INFO: fisilab_brand::AppInfo = fisilab_brand::AppInfo {
-    name: "FisiCAD",
+    name: "CAD",
     tagline: "Desenho técnico e CAD",
     equivalent: "Autodesk AutoCAD",
     version: env!("CARGO_PKG_VERSION"),
@@ -73,9 +73,9 @@ pub const APP_INFO: fisilab_brand::AppInfo = fisilab_brand::AppInfo {
 /// is kept.
 pub const FIRST_RUN_LANGUAGE: i18n::Preference = i18n::Preference::BrazilianPortuguese;
 
-/// Suíte FisiLab links (Help ▸ About FisiCAD).
+/// Suíte FisiLab links (Help ▸ About CAD).
 pub const UPSTREAM_URL: &str = "https://github.com/storytold/cadcraft";
-pub const ISSUES_URL: &str = "https://github.com/mrcandrade/fisicad/issues";
+pub const ISSUES_URL: &str = "https://github.com/mrcandrade/fisilab-cad/issues";
 
 /// The host storage key for [`CadApp::prefs_json`].
 pub const PREFS_KEY: &str = "cadcraft.prefs";
@@ -493,7 +493,7 @@ impl CadApp {
     pub fn open_size_error(name: &str, len: u64) -> Option<String> {
         (len > Self::MAX_OPEN_BYTES).then(|| {
             format!(
-                "Open: {name} is {:.1} MB, larger than the {} MB FisiCAD opens in the browser",
+                "Open: {name} is {:.1} MB, larger than the {} MB FisiLab CAD opens in the browser",
                 len as f64 / 1048576.0,
                 Self::MAX_OPEN_BYTES >> 20
             )

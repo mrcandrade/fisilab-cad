@@ -28,7 +28,7 @@
 	= Equals	= Égal à
 	> Greater than	> Supérieur à
 	About	À propos
-	About FisiCAD	À propos de FisiCAD
+	About CAD	À propos de CAD
 	Absolute	Absolu
 	Add Leader	Ajouter un repère
 	Align	Aligner
@@ -83,7 +83,7 @@
 	ByBlock	DuBloc
 	ByColor	Par couleur
 	ByLayer	DuCalque
-	FisiCAD Help	Aide de FisiCAD
+	CAD Help	Aide de CAD
 	Cancel	Annuler
 	Cartesian (x, y)	Cartésien (x, y)
 	Center	Centre
@@ -582,7 +582,7 @@
 	Quick Select Properties	Propriétés de la sélection rapide
 	Quick Select...	Sélection rapide...
 	QuickCalc	Calculatrice rapide
-	Quit FisiCAD	Quitter FisiCAD
+	Quit CAD	Quitter CAD
 	Radius	Rayon
 	Raster Image	Image raster
 	Ray	Rayon
@@ -991,7 +991,7 @@
 @plural	{n} contributor	{n} contributeur|{n} contributeurs
 	Drawing as bytes	Dessin sous forme d'octets
 	Services	Services
-	Hide FisiCAD	Masquer FisiCAD
+	Hide CAD	Masquer CAD
 	Hide Others	Masquer les autres
 	Accessibility	Accessibilité
 	Show System Cursor	Afficher le curseur système

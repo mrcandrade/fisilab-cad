@@ -71,9 +71,9 @@ impl PlotterStore {
                 Some(r) if !r.is_empty() => Some(PathBuf::from(r)),
                 Some(_) => None,
                 None => match std::env::consts::OS {
-                    "macos" => get("HOME").map(|h| h.join("Library/Application Support/FisiCAD")),
-                    "windows" => get("APPDATA").map(|r| r.join("FisiCAD")),
-                    _ => get("XDG_CONFIG_HOME").map(|r| r.join("fisicad")).or_else(|| get("HOME").map(|h| h.join(".config/fisicad"))),
+                    "macos" => get("HOME").map(|h| h.join("Library/Application Support/FisiLab CAD")),
+                    "windows" => get("APPDATA").map(|r| r.join("FisiLab CAD")),
+                    _ => get("XDG_CONFIG_HOME").map(|r| r.join("fisilab-cad")).or_else(|| get("HOME").map(|h| h.join(".config/fisilab-cad"))),
                 },
             };
             root.map(|r| r.join("plotters")).ok_or_else(|| "there is no settings folder for plotter configurations".to_string())

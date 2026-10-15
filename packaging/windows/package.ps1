@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
-  Build, sign and package FisiCAD (based on CADCraft) for Windows.
+  Build, sign and package CAD (based on CADCraft) for Windows.
 
 .DESCRIPTION
   Produces, in $env:DIST (default: dist/release):
-    fisicad-<version>-windows-<arch>.msi            per-machine installer (WiX v5)
-    fisicad-<version>-windows-<arch>-portable.zip   fisicad.exe + fisicad-cli.exe
+    fisilab-cad-<version>-windows-<arch>.msi            per-machine installer (WiX v5)
+    fisilab-cad-<version>-windows-<arch>-portable.zip   fisilab-cad.exe + fisilab-cad-cli.exe
 
   The binaries link the C runtime statically (+crt-static), so neither the MSI nor the portable
   zip needs the Visual C++ redistributable. Signing is delegated to sign.ps1 (skipped with a
@@ -55,7 +55,7 @@ New-Item -ItemType Directory -Force -Path $Dist | Out-Null
 if (-not $env:CADCRAFT_BUILD_SHA) { $env:CADCRAFT_BUILD_SHA = (git -C $Root rev-parse HEAD 2>$null) }
 if (-not $env:CADCRAFT_BUILD_DATE) { $env:CADCRAFT_BUILD_DATE = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd') }
 
-Write-Output "FisiCAD $Version for Windows $Arch ($Target)"
+Write-Output "CAD $Version for Windows $Arch ($Target)"
 
 if (-not $SkipBuild) {
   # Static CRT: no VC++ redistributable needed. Scoped to the target so host build scripts and
@@ -79,7 +79,7 @@ function Get-PeHeader([string] $Path) {
   return @{ Machine = [BitConverter]::ToUInt16($bytes, $pe + 4); Subsystem = [BitConverter]::ToUInt16($bytes, $pe + 0x5C) }
 }
 $Machine = switch ($Arch) { 'x64' { 0x8664 } 'x86' { 0x14C } 'arm64' { 0xAA64 } }
-foreach ($check in @(@('fisicad.exe', 2), @('fisicad-cli.exe', 3))) {
+foreach ($check in @(@('fisilab-cad.exe', 2), @('fisilab-cad-cli.exe', 3))) {
   $h = Get-PeHeader (Join-Path $Bin $check[0])
   if ($h.Machine -ne $Machine) { throw "$($check[0]) is for machine 0x$('{0:X}' -f $h.Machine), expected 0x$('{0:X}' -f $Machine) ($Arch)" }
   if ($h.Subsystem -ne $check[1]) { throw "$($check[0]) has PE subsystem $($h.Subsystem), expected $($check[1])" }
@@ -88,15 +88,15 @@ foreach ($check in @(@('fisicad.exe', 2), @('fisicad-cli.exe', 3))) {
 $Stage = Join-Path $TargetDir "windows-package\$Arch"
 Remove-Item -Recurse -Force $Stage -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Force -Path $Stage | Out-Null
-Copy-Item (Join-Path $Bin 'fisicad.exe'), (Join-Path $Bin 'fisicad-cli.exe') $Stage
+Copy-Item (Join-Path $Bin 'fisilab-cad.exe'), (Join-Path $Bin 'fisilab-cad-cli.exe') $Stage
 
-& (Join-Path $PSScriptRoot 'sign.ps1') (Join-Path $Stage 'fisicad.exe') (Join-Path $Stage 'fisicad-cli.exe')
+& (Join-Path $PSScriptRoot 'sign.ps1') (Join-Path $Stage 'fisilab-cad.exe') (Join-Path $Stage 'fisilab-cad-cli.exe')
 
 # ---- MSI ---------------------------------------------------------------------------------------
-$Msi = Join-Path $Dist "fisicad-$Version-windows-$Arch.msi"
+$Msi = Join-Path $Dist "fisilab-cad-$Version-windows-$Arch.msi"
 Invoke-Native 'wix build' {
   wix build (Join-Path $PSScriptRoot 'cadcraft.wxs') -arch $Arch -ext WixToolset.UI.wixext `
-    -d "Version=$MsiVersion" -d "BinDir=$Stage" -d "IconPath=$(Join-Path $Root 'assets\fisilab\fisicad.ico')" `
+    -d "Version=$MsiVersion" -d "BinDir=$Stage" -d "IconPath=$(Join-Path $Root 'assets\fisilab\fisilab-cad.ico')" `
     -o $Msi
 }
 # wix writes its debug symbols (.wixpdb) next to the MSI; keep them out of the release assets.
@@ -118,7 +118,7 @@ if ($env:CRAFT_FONTS_DIR) {
     Copy-Item $ofl.FullName (Join-Path $Portable "OFL-$($ofl.Directory.Name).txt")
   }
 }
-$Zip = Join-Path $Dist "fisicad-$Version-windows-$Arch-portable.zip"
+$Zip = Join-Path $Dist "fisilab-cad-$Version-windows-$Arch-portable.zip"
 Remove-Item -Force $Zip -ErrorAction SilentlyContinue
 Compress-Archive -Path $Portable -DestinationPath $Zip
 
@@ -126,8 +126,8 @@ Compress-Archive -Path $Portable -DestinationPath $Zip
 # here; .github/workflows/windows-arm64.yml installs and runs it on ARM64 instead.
 $HostArch = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant()
 if ($Arch -ne 'arm64' -or $HostArch -eq 'arm64') {
-  Invoke-Native 'fisicad-cli --version' { & (Join-Path $Stage 'fisicad-cli.exe') --version }
+  Invoke-Native 'fisilab-cad-cli --version' { & (Join-Path $Stage 'fisilab-cad-cli.exe') --version }
 } else {
-  Write-Output "skipping fisicad-cli --version: an $Arch build doesn't run on this $HostArch machine"
+  Write-Output "skipping fisilab-cad-cli --version: an $Arch build doesn't run on this $HostArch machine"
 }
 Get-Item $Msi, $Zip | Format-Table Name, Length

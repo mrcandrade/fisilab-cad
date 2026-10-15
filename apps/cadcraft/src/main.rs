@@ -1,6 +1,6 @@
-//! FisiCAD desktop app (Suíte FisiLab; based on CADCraft).
+//! CAD desktop app (Suíte FisiLab; based on CADCraft).
 //!
-//! Usage: `fisicad [--control <port>] [--sample] [files…]`
+//! Usage: `fisilab-cad [--control <port>] [--sample] [files…]`
 //!
 //! `--control <port>` (or `CADCRAFT_CONTROL_PORT`) starts a localhost JSON-lines control server:
 //! `{"id":1,"method":"cmdline.input","params":{"text":"circle 0,0 5"}}` → `{"id":1,"ok":true,…}`.
@@ -46,7 +46,7 @@ impl App {
         let result = if final_attempt { self.workspace.save_on_exit(&self.cad.ui) } else { self.workspace.save_if_changed(&self.cad.ui) };
         if let Err(error) = result {
             if self.workspace_error.as_ref() != Some(&error) {
-                eprintln!("FisiCAD workspace: {error}");
+                eprintln!("CAD workspace: {error}");
                 self.cad.set_status(format!("Workspace could not be saved: {error}"));
                 self.workspace_error = Some(error);
             }
@@ -159,8 +159,8 @@ fn filters_for_save(name: &str) -> [(&'static str, &'static str); 6] {
 }
 
 /// The per-user settings directory (it holds `logs/` and `autosave/`): `CADCRAFT_CONFIG_DIR` if set, else
-/// `$XDG_CONFIG_HOME/fisicad` or `~/.config/fisicad` on Linux and the BSDs,
-/// `~/Library/Application Support/FisiCAD` on macOS, `%APPDATA%\FisiCAD` on Windows (FisiCAD's own
+/// `$XDG_CONFIG_HOME/fisilab-cad` or `~/.config/fisilab-cad` on Linux and the BSDs,
+/// `~/Library/Application Support/FisiLab CAD` on macOS, `%APPDATA%\FisiLab CAD` on Windows (FisiLab CAD's own
 /// folders, so an upstream CADCraft install keeps its settings).
 fn config_dir() -> Option<std::path::PathBuf> {
     config_dir_from(|k| std::env::var_os(k))
@@ -174,24 +174,24 @@ fn config_dir_from(var: impl Fn(&str) -> Option<std::ffi::OsString>) -> Option<s
         return Some(dir);
     }
     if cfg!(target_os = "macos") {
-        set("HOME").map(|h| h.join("Library/Application Support/FisiCAD"))
+        set("HOME").map(|h| h.join("Library/Application Support/FisiLab CAD"))
     } else if cfg!(windows) {
-        set("APPDATA").map(|a| a.join("FisiCAD"))
+        set("APPDATA").map(|a| a.join("FisiLab CAD"))
     } else {
         // The XDG spec ignores a relative XDG_CONFIG_HOME.
-        set("XDG_CONFIG_HOME").filter(|p| p.is_absolute()).or_else(|| set("HOME").map(|h| h.join(".config"))).map(|c| c.join("fisicad"))
+        set("XDG_CONFIG_HOME").filter(|p| p.is_absolute()).or_else(|| set("HOME").map(|h| h.join(".config"))).map(|c| c.join("fisilab-cad"))
     }
 }
 
-const APP_ID: &str = "br.ufrgs.fisilab.fisicad";
+const APP_ID: &str = "br.ufrgs.fisilab.cad";
 
 /// Stencil bits of the window's render pass (see `NativeOptions::stencil_buffer`).
 const STENCIL_BITS: u8 = 8;
 
 #[cfg(target_os = "macos")]
-const APP_ICON_PNG: &[u8] = include_bytes!("../../../assets/fisilab/fisicad-512.png");
+const APP_ICON_PNG: &[u8] = include_bytes!("../../../assets/fisilab/fisilab-cad-512.png");
 #[cfg(not(target_os = "macos"))]
-const APP_ICON_PNG: &[u8] = include_bytes!("../../../assets/fisilab/fisicad-256.png");
+const APP_ICON_PNG: &[u8] = include_bytes!("../../../assets/fisilab/fisilab-cad-256.png");
 
 fn app_icon() -> Option<egui::IconData> {
     eframe::icon_data::from_png_bytes(APP_ICON_PNG).map_err(|e| log::warn!("app icon: {e}")).ok()
@@ -199,7 +199,7 @@ fn app_icon() -> Option<egui::IconData> {
 
 fn version_string() -> String {
     let sha = option_env!("CADCRAFT_BUILD_SHA").unwrap_or("dev");
-    format!("fisicad {} ({sha}) — FisiCAD, Suíte FisiLab (baseado no CADCraft)", env!("CARGO_PKG_VERSION"))
+    format!("fisilab-cad {} ({sha}) — CAD, Suíte FisiLab (baseado no CADCraft)", env!("CARGO_PKG_VERSION"))
 }
 
 /// The control port from `--control <port>` or `CADCRAFT_CONTROL_PORT` (`source`); a value that is
@@ -267,7 +267,7 @@ fn main() -> eframe::Result {
         // swapchains hold two frames back under vsync (`CADCRAFT_VSYNC=1` restores vsync).
         wgpu_options: eframe::egui_wgpu::WgpuConfiguration::default().with_surface_config(surface),
         viewport: egui::ViewportBuilder::default()
-            .with_title("FisiCAD")
+            .with_title("CAD")
             .with_inner_size([1600.0, 1000.0])
             .with_min_inner_size([900.0, 560.0])
             .with_drag_and_drop(true)
@@ -308,7 +308,7 @@ fn main() -> eframe::Result {
         }));
     }
     eframe::run_native(
-        "FisiCAD",
+        "CAD",
         options,
         Box::new(move |cc| {
             let mut app = CadApp::new(Session::empty(), services());
@@ -317,7 +317,7 @@ fn main() -> eframe::Result {
                 app.ui = ui;
             }
             if let Some(error) = &workspace_error {
-                eprintln!("FisiCAD workspace: {error}");
+                eprintln!("CAD workspace: {error}");
                 app.set_status(error);
             }
             app.system_languages = std::env::var("CADCRAFT_LOCALE").map(|s| vec![s]).unwrap_or_else(|_| sys_locale::get_locales().collect());
@@ -327,7 +327,7 @@ fn main() -> eframe::Result {
             }
             match cc.storage.and_then(|s| s.get_string(cadcraft_ui_egui::PREFS_KEY)) {
                 Some(prefs) => app.load_prefs(&prefs),
-                // A fresh install: FisiCAD starts in Brazilian Portuguese (the user's later choice,
+                // A fresh install: CAD starts in Brazilian Portuguese (the user's later choice,
                 // "auto" included, is saved and kept).
                 None => app.ui.interface_language = cadcraft_ui_egui::FIRST_RUN_LANGUAGE,
             }
@@ -441,16 +441,16 @@ mod tests {
     #[cfg(all(unix, not(target_os = "macos")))]
     #[test]
     fn linux_and_bsd_follow_xdg_config_home() {
-        assert_eq!(config_dir_from(env(&[("XDG_CONFIG_HOME", "/x"), ("HOME", "/home/u")])), Some(PathBuf::from("/x/fisicad")));
-        assert_eq!(config_dir_from(env(&[("HOME", "/home/u")])), Some(PathBuf::from("/home/u/.config/fisicad")));
+        assert_eq!(config_dir_from(env(&[("XDG_CONFIG_HOME", "/x"), ("HOME", "/home/u")])), Some(PathBuf::from("/x/fisilab-cad")));
+        assert_eq!(config_dir_from(env(&[("HOME", "/home/u")])), Some(PathBuf::from("/home/u/.config/fisilab-cad")));
         // The XDG spec says a relative XDG_CONFIG_HOME is ignored.
-        assert_eq!(config_dir_from(env(&[("XDG_CONFIG_HOME", "rel"), ("HOME", "/home/u")])), Some(PathBuf::from("/home/u/.config/fisicad")));
+        assert_eq!(config_dir_from(env(&[("XDG_CONFIG_HOME", "rel"), ("HOME", "/home/u")])), Some(PathBuf::from("/home/u/.config/fisilab-cad")));
     }
 
     #[cfg(target_os = "macos")]
     #[test]
     fn macos_uses_application_support() {
-        assert_eq!(config_dir_from(env(&[("HOME", "/Users/u")])), Some(PathBuf::from("/Users/u/Library/Application Support/FisiCAD")));
+        assert_eq!(config_dir_from(env(&[("HOME", "/Users/u")])), Some(PathBuf::from("/Users/u/Library/Application Support/FisiLab CAD")));
     }
 
     #[cfg(windows)]
@@ -458,7 +458,7 @@ mod tests {
     fn windows_uses_appdata() {
         assert_eq!(
             config_dir_from(env(&[("APPDATA", "C:\\Users\\u\\AppData\\Roaming")])),
-            Some(PathBuf::from("C:\\Users\\u\\AppData\\Roaming").join("FisiCAD"))
+            Some(PathBuf::from("C:\\Users\\u\\AppData\\Roaming").join("FisiLab CAD"))
         );
     }
 

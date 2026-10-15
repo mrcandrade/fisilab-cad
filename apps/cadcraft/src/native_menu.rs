@@ -36,17 +36,17 @@ impl NativeMenu {
         let language = app.language();
         let mut submenus = Vec::new();
         let mut counter = 0usize;
-        let app_menu = Submenu::new("FisiCAD", true);
-        let about = MenuItem::with_id("cc-about", i18n::tr(language, "About FisiCAD"), true, None);
+        let app_menu = Submenu::new("CAD", true);
+        let about = MenuItem::with_id("cc-about", i18n::tr(language, "About CAD"), true, None);
         let suite = MenuItem::with_id("cc-fisilab", i18n::tr(language, fisilab_brand::ABOUT_MENU_LABEL), true, None);
         let predefined = vec![
             ("Services", PredefinedMenuItem::services(Some(i18n::tr(language, "Services")))),
-            ("Hide FisiCAD", PredefinedMenuItem::hide(Some(i18n::tr(language, "Hide FisiCAD")))),
+            ("Hide CAD", PredefinedMenuItem::hide(Some(i18n::tr(language, "Hide CAD")))),
             ("Hide Others", PredefinedMenuItem::hide_others(Some(i18n::tr(language, "Hide Others")))),
             ("Show All", PredefinedMenuItem::show_all(Some(i18n::tr(language, "Show All")))),
-            ("Quit FisiCAD", PredefinedMenuItem::quit(Some(i18n::tr(language, "Quit FisiCAD")))),
+            ("Quit CAD", PredefinedMenuItem::quit(Some(i18n::tr(language, "Quit CAD")))),
         ];
-        // The Mac place for preferences: FisiCAD ▸ Settings… (⌘,) opens the Options dialog.
+        // The Mac place for preferences: CAD ▸ Settings… (⌘,) opens the Options dialog.
         let settings = MenuItem::with_id("cc-settings", i18n::tr(language, "Settings..."), true, accel("Cmd+Comma"));
         let _ = app_menu.append_items(&[&about, &suite, &PredefinedMenuItem::separator(), &settings, &PredefinedMenuItem::separator()]);
         for (label, item) in &predefined {
@@ -55,7 +55,7 @@ impl NativeMenu {
                 let _ = app_menu.append(&PredefinedMenuItem::separator());
             }
         }
-        items.insert("cc-about".into(), ("ui.dialog.about".into(), "About FisiCAD".into(), about));
+        items.insert("cc-about".into(), ("ui.dialog.about".into(), "About CAD".into(), about));
         items.insert("cc-fisilab".into(), ("ui.fisilab.about".into(), fisilab_brand::ABOUT_MENU_LABEL.into(), suite));
         items.insert("cc-settings".into(), ("options".into(), "Settings...".into(), settings));
         let _ = menu.append(&app_menu);

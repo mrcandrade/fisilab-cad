@@ -1,6 +1,6 @@
-//! Windows only: embed the app icon and version info into `fisicad.exe`. Elsewhere a no-op.
+//! Windows only: embed the app icon and version info into `fisilab-cad.exe`. Elsewhere a no-op.
 
-const ICON: &str = "../../assets/fisilab/fisicad.ico";
+const ICON: &str = "../../assets/fisilab/fisilab-cad.ico";
 
 fn main() {
     println!("cargo:rerun-if-changed=build.rs");
@@ -14,20 +14,20 @@ fn main() {
     if std::path::Path::new(ICON).exists() {
         res.set_icon(ICON);
     }
-    res.set("ProductName", "FisiCAD")
-        .set("FileDescription", "FisiCAD — Desenho técnico e CAD (Suíte FisiLab)")
+    res.set("ProductName", "CAD")
+        .set("FileDescription", "CAD — Desenho técnico (Suíte FisiLab)")
         .set("CompanyName", "FisiLab — LARFIC/UFRGS")
         .set(
             "LegalCopyright",
             "Baseado no CADCraft (© ArtCraft Team e contribuidores). Modificações © 2026 FisiLab — LARFIC/UFRGS. MIT OR Apache-2.0.",
         )
-        .set("OriginalFilename", "fisicad.exe")
-        .set("InternalName", "fisicad");
+        .set("OriginalFilename", "fisilab-cad.exe")
+        .set("InternalName", "fisilab-cad");
     if let Err(e) = res.compile() {
         if std::env::var_os("CADCRAFT_REQUIRE_WINRES").is_some() {
             eprintln!("embedding Windows resources failed: {e}");
             std::process::exit(1);
         }
-        println!("cargo:warning=fisicad.exe built without icon/version resources: {e}");
+        println!("cargo:warning=fisilab-cad.exe built without icon/version resources: {e}");
     }
 }

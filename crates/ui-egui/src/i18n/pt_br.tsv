@@ -30,7 +30,7 @@
 	A drawing opened from a file keeps that file's format.	Um desenho aberto de um arquivo mantém o formato desse arquivo.
 	A variable name starts with a letter and has only letters, digits and _	Um nome de variável começa com uma letra e contém apenas letras, dígitos e _
 	About	Sobre
-	About FisiCAD	Sobre o FisiCAD
+	About CAD	Sobre o CAD
 	Absolute	Absoluto
 	Add Current Scale	Adicionar escala atual
 	Add Leader	Adicionar linha de chamada
@@ -105,9 +105,9 @@
 	ByBlock	PorBloco
 	ByColor	PorCor
 	ByLayer	PorCamada
-	FisiCAD	FisiCAD
-	FisiCAD Help	Ajuda do FisiCAD
-	FisiCAD keeps these preferences, object snap modes and drafting toggles for your user account and restores them when it starts.	O FisiCAD mantém estas preferências, modos de referência a objetos e alternâncias de desenho na sua conta de usuário e as restaura ao iniciar.
+	CAD	CAD
+	CAD Help	Ajuda do CAD
+	CAD keeps these preferences, object snap modes and drafting toggles for your user account and restores them when it starts.	O CAD mantém estas preferências, modos de referência a objetos e alternâncias de desenho na sua conta de usuário e as restaura ao iniciar.
 	Cancel	Cancelar
 	Cartesian (x, y)	Cartesiano (x, y)
 	Center	Centro
@@ -786,7 +786,7 @@
 	Quick Select Properties	Propriedades da seleção rápida
 	Quick Select...	Seleção rápida...
 	QuickCalc	Calculadora
-	Quit FisiCAD	Sair do FisiCAD
+	Quit CAD	Sair do CAD
 	Radius	Raio
 	Raster Image	Imagem raster
 	Ray	Semirreta
@@ -1212,7 +1212,7 @@
 @plural	{n} contributor	{n} colaborador|{n} colaboradores
 	Drawing as bytes	Desenho como bytes
 	Services	Serviços
-	Hide FisiCAD	Ocultar o FisiCAD
+	Hide CAD	Ocultar o CAD
 	Hide Others	Ocultar outros
 	Accessibility	Acessibilidade
 	Show System Cursor	Exibir cursor do sistema
@@ -1241,7 +1241,7 @@
 	Query Texts	Consultar textos
 	Run Script...	Executar script...
 	Not a number or distance: {text}	Não é um número nem uma distância: {text}
-# Suíte FisiLab (FisiCAD): theme names and the suite About window.
+# Suíte FisiLab (CAD): theme names and the suite About window.
 	UFRGS Noite	UFRGS Noite
 	UFRGS Dia	UFRGS Dia
 	Sobre a Suíte FisiLab…	Sobre a Suíte FisiLab…
