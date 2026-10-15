@@ -31,16 +31,13 @@ seguem os mesmos termos do original (MIT OR Apache-2.0).
   macOS. A janela "Sobre o CAD" original continua (com os contribuidores do CADCraft) e ganhou
   os créditos da suíte e os links abaixo.
 
-### Temas "UFRGS Noite" e "UFRGS Dia"
-- `crates/ui-egui/src/theme.rs`: dois temas novos, feitos com as cores da marca
-  (`fisilab_brand::palette::NOITE` e `DIA`), primeiros da lista. **UFRGS Noite é o padrão.** Os
-  temas originais (Usar configuração do sistema, Claro, Escuro) continuam disponíveis.
-- A área de desenho (espaço do modelo) usa o fundo mais escuro da marca nos dois temas, com grade
-  e eixos derivados dele; as cores de desenho CAD (seleção, grips, snaps, cursor, papel) são as do
-  original, pois codificam informação do desenho.
-- Novo token `accent_text` (texto sobre o botão de destaque), para manter contraste no tema claro.
-- Testes novos: tema padrão, nomes dos temas, origem das cores, contraste de texto em todos os
-  temas e instalação dos estilos no `egui`.
+### Temas "Noite" e "Dia"
+- Paleta original do CADCraft, sem cores novas. `crates/ui-egui/src/theme.rs` apenas ganhou os
+  nomes: **Noite** (o tema escuro original, padrão) e **Dia** (o tema claro original), primeiros
+  da lista; "Usar configuração do sistema" continua disponível. O interpretador de nomes aceita
+  também `noite`/`night` e `dia`/`day`; os ids salvos continuam `dark` e `light`.
+- Idioma: o CAD abre em português do Brasil na primeira execução (`FIRST_RUN_LANGUAGE`, aplicado
+  pelo app desktop só quando não há preferências salvas); o padrão da biblioteca é o original.
 
 ### Links da comunidade
 - Removidos os links para o Discord da ArtCraft e para getartcraft.com (janela Sobre, menu do macOS,

@@ -95,12 +95,10 @@ fn hint(ui: &mut egui::Ui, text: &str) {
 
 fn theme_label(t: ThemePref) -> &'static str {
     match t {
-        // Proper names of the Suíte FisiLab themes: not translated.
-        ThemePref::UfrgsNoite => "UFRGS Noite",
-        ThemePref::UfrgsDia => "UFRGS Dia",
         ThemePref::System => crate::tl!("Use System Setting"),
-        ThemePref::Light => crate::tl!("Light"),
-        ThemePref::Dark => crate::tl!("Dark"),
+        ThemePref::Light => "Dia",
+        // "Noite" and "Dia" are literal Portuguese names in every language: not translated.
+        ThemePref::Dark => "Noite",
     }
 }
 
@@ -165,11 +163,11 @@ fn display(app: &CadApp, ui: &mut egui::Ui, changes: &mut Map<String, Value>) {
         ui.end_row();
 
         ui.label(crate::tl!("Model background"));
-        color_row(ui, app.options.model_background, crate::theme::active_palette().tokens().canvas, "modelBackground", changes);
+        color_row(ui, app.options.model_background, Tokens::DARK.canvas, "modelBackground", changes);
         ui.end_row();
 
         ui.label(crate::tl!("Layout paper"));
-        color_row(ui, app.options.paper_background, crate::theme::active_palette().tokens().paper, "paperBackground", changes);
+        color_row(ui, app.options.paper_background, Tokens::DARK.paper, "paperBackground", changes);
         ui.end_row();
 
         ui.label(crate::tl!("Crosshair size"));
@@ -320,7 +318,7 @@ fn selection(app: &CadApp, ui: &mut egui::Ui, changes: &mut Map<String, Value>) 
         }
         left.add_space(4.0);
         left.label(crate::tl!("Selection effect color"));
-        color_row(left, app.options.selection_color, crate::theme::active_palette().tokens().selection, "selectionColor", changes);
+        color_row(left, app.options.selection_color, crate::theme::Tokens::of(crate::theme::active()).selection, "selectionColor", changes);
 
         // Right: grips and the preview under the cursor.
         heading(right, crate::tl!("Grip size"));

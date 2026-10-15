@@ -116,8 +116,8 @@ pub struct UiState {
     pub start_tab: bool,
     pub dialog: Option<String>,
     pub history_lines: usize,
-    /// Interface theme: "ufrgsNoite" (the default), "ufrgsDia", "system" (follow the OS
-    /// light/dark appearance), "light" or "dark".
+    /// Interface theme: "system" (follow the OS light/dark appearance), "light" (shown as "Dia")
+    /// or "dark" (shown as "Noite", the default).
     pub theme: theme::ThemePref,
     /// Animation effects (dialog and menu fades, smoothed scrolling): "system" (follow the OS
     /// setting), "on" or "off".
@@ -239,8 +239,8 @@ pub struct CadApp {
     pub frame_cap: Option<gpu::FrameCap>,
     /// Language whose interface fonts are installed (`None` until the first frame).
     fonts_language: Option<&'static str>,
-    /// The palette last installed into egui (`None` until the first frame).
-    shown_theme: Option<theme::Palette>,
+    /// The theme last installed into egui (`None` until the first frame).
+    shown_theme: Option<egui::Theme>,
     /// Help ▸ Sobre a Suíte FisiLab… was chosen: the brand's About window opens on the next frame.
     pub fisilab_about_requested: bool,
     /// Whether the last applied theme was handed to egui as the System preference.
@@ -376,12 +376,7 @@ impl CadApp {
 
     /// The theme the interface shows now (the choice resolved against the OS appearance).
     pub fn shown_theme(&self) -> egui::Theme {
-        self.shown_palette().theme()
-    }
-
-    /// The palette the interface shows now (the choice resolved against the OS appearance).
-    pub fn shown_palette(&self) -> theme::Palette {
-        self.shown_theme.unwrap_or_else(|| self.ui.theme.palette(None))
+        self.shown_theme.unwrap_or_else(|| self.ui.theme.resolve(None))
     }
 
     /// Whether the interface shows animation effects now (the choice resolved against the OS
@@ -572,7 +567,7 @@ impl CadApp {
         }
         // Resolved every frame, so a System choice follows the OS appearance live (winit and the
         // browser report changes as input); the saved choice itself never changes here.
-        let shown = self.ui.theme.palette(ctx.system_theme());
+        let shown = self.ui.theme.resolve(ctx.system_theme());
         theme::set_active(shown);
         theme::set_canvas(self.options.canvas());
         let follows_system = self.ui.theme == theme::ThemePref::System;
@@ -796,17 +791,12 @@ mod tests {
     #[test]
     fn theme_choice_persists_and_drives_tokens() {
         let mut a = app();
-        assert_eq!(a.ui.theme, ThemePref::UfrgsNoite, "UFRGS Noite is the default");
-        let ctx = egui::Context::default();
-        frame(&mut a, &ctx, Some(egui::Theme::Light));
-        assert_eq!(Tokens::get(), Tokens::NOITE);
-        assert_eq!(ctx.theme(), egui::Theme::Dark);
-        assert_eq!(a.run("ui.theme", json!({ "theme": "ufrgsDia" })).ok(), Some(json!({ "theme": "ufrgsDia", "shown": "light" })));
-        frame(&mut a, &ctx, Some(egui::Theme::Dark));
-        assert_eq!(Tokens::get(), Tokens::DIA);
-        assert_eq!(ctx.theme(), egui::Theme::Light);
-        a.start("ui.theme.ufrgsNoite");
-        assert_eq!(a.ui.theme, ThemePref::UfrgsNoite);
+        assert_eq!(a.ui.theme, ThemePref::Dark, "default keeps today's look (shown as Noite)");
+        assert_eq!(ThemePref::parse("noite"), Some(ThemePref::Dark));
+        assert_eq!(ThemePref::parse("Night"), Some(ThemePref::Dark));
+        assert_eq!(ThemePref::parse("dia"), Some(ThemePref::Light));
+        assert_eq!(ThemePref::parse("day"), Some(ThemePref::Light));
+        assert_eq!(&ThemePref::ALL[..2], &[ThemePref::Dark, ThemePref::Light], "Noite and Dia come first");
         assert!(a.run("ui.theme", json!({ "theme": "Purple" })).is_err());
         assert_eq!(a.run("ui.theme", json!({ "theme": "light" })).ok(), Some(json!({ "theme": "light", "shown": "light" })));
         // Saved and restored by the host.

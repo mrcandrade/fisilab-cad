@@ -101,7 +101,7 @@ fn json_form_sets_interface_and_engine_preferences_all_or_nothing() {
     a.run("options", json!({"modelBackground": null, "interfaceLanguage": "uk"})).unwrap();
     assert_eq!(a.options.model_background, None);
     let r = a.run("options", json!({"reset": true})).unwrap();
-    assert_eq!((r["theme"].clone(), r["GRIPSIZE"].clone(), r["snapMarkerSize"].clone()), (json!("ufrgsNoite"), json!(5.0), json!(11.0)));
+    assert_eq!((r["theme"].clone(), r["GRIPSIZE"].clone(), r["snapMarkerSize"].clone()), (json!("dark"), json!(5.0), json!(11.0)));
     assert_eq!(r["interfaceLanguage"], "uk");
 }
 
@@ -151,18 +151,18 @@ fn model_background_reaches_the_drawing_area_tokens() {
     let mut a = app();
     let ctx = egui::Context::default();
     a.logic(&ctx);
-    assert_eq!(Tokens::get().canvas, Tokens::NOITE.canvas, "UFRGS Noite is the default");
+    assert_eq!(Tokens::get().canvas, Tokens::DARK.canvas);
     a.run("options", json!({"modelBackground": "#ffffff", "paperBackground": "#202020"})).unwrap();
     a.logic(&ctx);
     let t = Tokens::get();
     assert_eq!(t.canvas, Color32::WHITE);
     assert_eq!(t.paper, Color32::from_gray(0x20));
     assert!(cadcraft_ui_egui::theme::luminance(t.crosshair) < 0.5, "a dark crosshair on a white background");
-    assert_ne!(t.grid_minor, Tokens::NOITE.grid_minor);
-    assert_eq!(t.chrome, Tokens::NOITE.chrome, "the interface keeps its theme");
+    assert_ne!(t.grid_minor, Tokens::DARK.grid_minor);
+    assert_eq!(t.chrome, Tokens::DARK.chrome, "the interface keeps its theme");
     a.run("options", json!({"reset": true})).unwrap();
     a.logic(&ctx);
-    assert_eq!(Tokens::get(), Tokens::NOITE);
+    assert_eq!(Tokens::get(), Tokens::DARK);
 }
 
 #[test]

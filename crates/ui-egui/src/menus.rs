@@ -39,11 +39,9 @@ pub const UI_COMMANDS: &[(&str, &str, &[&str], Option<&str>)] = &[
     ("ui.toggle.cmdline", "Command Line", &["Window", "Command Line"], Some("Cmd+9")),
     ("ui.toggle.viewcube", "ViewCube", &["View", "ViewCube", "On"], None),
     ("ui.toggle.ucsicon", "UCS Icon", &["View", "UCS Icon", "On"], None),
-    ("ui.theme.ufrgsNoite", "UFRGS Noite", &["View", "Interface Theme", "UFRGS Noite"], None),
-    ("ui.theme.ufrgsDia", "UFRGS Dia", &["View", "Interface Theme", "UFRGS Dia"], None),
+    ("ui.theme.dark", "Noite", &["View", "Interface Theme", "Noite"], None),
+    ("ui.theme.light", "Dia", &["View", "Interface Theme", "Dia"], None),
     ("ui.theme.system", "Use System Setting", &["View", "Interface Theme", "Use System Setting"], None),
-    ("ui.theme.light", "Light", &["View", "Interface Theme", "Light"], None),
-    ("ui.theme.dark", "Dark", &["View", "Interface Theme", "Dark"], None),
     ("ui.theme", "Interface Theme", &[], None),
     ("ui.saveformat.dxf", "DXF", &["File", "Default Save Format", "DXF"], None),
     ("ui.saveformat.dwg", "DWG", &["File", "Default Save Format", "DWG"], None),
@@ -249,15 +247,15 @@ fn run_ui_command_inner(app: &mut CadApp, id: &str, params: &Value) -> Option<Re
             toggle(&mut app.ui.in_window_menu, params);
             Ok(Value::Null)
         }
-        "ui.theme.ufrgsNoite" | "ui.theme.ufrgsDia" | "ui.theme.system" | "ui.theme.light" | "ui.theme.dark" => {
+        "ui.theme.system" | "ui.theme.light" | "ui.theme.dark" => {
             let pref = crate::theme::ThemePref::parse(id.trim_start_matches("ui.theme.")).unwrap_or_default();
             set_theme(app, pref)
         }
-        // `{"theme": "ufrgsNoite"|"ufrgsDia"|"system"|"light"|"dark"}` sets the choice; without it, reports it.
+        // `{"theme": "system"|"light"|"dark"}` ("noite" = dark, "dia" = light) sets the choice; without it, reports it.
         "ui.theme" => match params.get("theme").and_then(Value::as_str) {
             Some(name) => match crate::theme::ThemePref::parse(name) {
                 Some(pref) => set_theme(app, pref),
-                None => Err(format!("unknown theme \"{name}\" (ufrgsNoite, ufrgsDia, system, light or dark)")),
+                None => Err(format!("unknown theme \"{name}\" (system, light, dark, noite or dia)")),
             },
             None => Ok(theme_json(app)),
         },

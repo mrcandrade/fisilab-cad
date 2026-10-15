@@ -1,12 +1,10 @@
 //! Design tokens. Colours were measured from the reference look (dark slate chrome, near-black
 //! navy model space) and are CADCraft's own values; every widget reads them from here.
 //!
-//! Four palettes: [`Tokens::NOITE`] ("UFRGS Noite", the Suíte FisiLab's dark look and the default)
-//! and [`Tokens::DIA`] ("UFRGS Dia", its light look), both built from `fisilab_brand::palette`, plus
-//! the upstream [`Tokens::DARK`] (CADCraft's original look) and [`Tokens::LIGHT`]. The interface
-//! theme changes the chrome (title and tool bar, menus, palettes, tabs, command line, status bar,
-//! dialogs); the drawing area keeps its model-space colours in every theme, as drawing colours are
-//! not part of the interface theme. [`Tokens::get`] returns the palette of the theme in use, which
+//! Two palettes: [`Tokens::DARK`] (the original look) and [`Tokens::LIGHT`]. The interface theme
+//! changes the chrome (title and tool bar, menus, palettes, tabs, command line, status bar,
+//! dialogs); the drawing area keeps its model-space colours in both, as drawing colours are not
+//! part of the interface theme. [`Tokens::get`] returns the palette of the theme in use, which
 //! [`CadApp::logic`](crate::CadApp::logic) resolves once per frame from the user's [`ThemePref`].
 
 use std::cell::Cell;
@@ -18,17 +16,12 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum ThemePref {
-    /// The default: "UFRGS Noite", the Suíte FisiLab's dark palette.
-    #[default]
-    #[serde(rename = "ufrgsNoite")]
-    UfrgsNoite,
-    /// "UFRGS Dia", the Suíte FisiLab's light palette.
-    #[serde(rename = "ufrgsDia")]
-    UfrgsDia,
-    /// Follow the operating system's light/dark appearance, live (with the upstream palettes).
+    /// Follow the operating system's light/dark appearance, live.
     System,
+    /// Shown as "Dia": the original light palette.
     Light,
-    /// CADCraft's original look.
+    /// Shown as "Noite" and the default: CADCraft's original dark look.
+    #[default]
     Dark,
 }
 
@@ -36,12 +29,10 @@ pub enum ThemePref {
 pub const SYSTEM_FALLBACK: Theme = Theme::Dark;
 
 impl ThemePref {
-    pub const ALL: [ThemePref; 5] = [ThemePref::UfrgsNoite, ThemePref::UfrgsDia, ThemePref::System, ThemePref::Light, ThemePref::Dark];
+    pub const ALL: [ThemePref; 3] = [ThemePref::Dark, ThemePref::Light, ThemePref::System];
 
     pub fn as_str(self) -> &'static str {
         match self {
-            ThemePref::UfrgsNoite => "ufrgsNoite",
-            ThemePref::UfrgsDia => "ufrgsDia",
             ThemePref::System => "system",
             ThemePref::Light => "light",
             ThemePref::Dark => "dark",
@@ -49,101 +40,37 @@ impl ThemePref {
     }
 
     pub fn parse(s: &str) -> Option<ThemePref> {
-        ThemePref::ALL.into_iter().find(|t| t.as_str().eq_ignore_ascii_case(s.trim()))
+        let s = s.trim();
+        match s.to_ascii_lowercase().as_str() {
+            "noite" | "night" => return Some(ThemePref::Dark),
+            "dia" | "day" => return Some(ThemePref::Light),
+            _ => {}
+        }
+        ThemePref::ALL.into_iter().find(|t| t.as_str().eq_ignore_ascii_case(s))
     }
 
-    /// The light/dark appearance to show, given what the OS reports (`ctx.system_theme()`).
+    /// The theme to show, given what the OS reports (`ctx.system_theme()`).
     pub fn resolve(self, system: Option<Theme>) -> Theme {
-        self.palette(system).theme()
-    }
-
-    /// The palette to show, given what the OS reports (`ctx.system_theme()`).
-    pub fn palette(self, system: Option<Theme>) -> Palette {
         match self {
-            ThemePref::UfrgsNoite => Palette::UfrgsNoite,
-            ThemePref::UfrgsDia => Palette::UfrgsDia,
-            ThemePref::System => Palette::from(system.unwrap_or(SYSTEM_FALLBACK)),
-            ThemePref::Light => Palette::Light,
-            ThemePref::Dark => Palette::Dark,
-        }
-    }
-}
-
-/// A concrete colour set: what a [`ThemePref`] resolves to on a given frame.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Palette {
-    UfrgsNoite,
-    UfrgsDia,
-    Dark,
-    Light,
-}
-
-impl Palette {
-    pub const ALL: [Palette; 4] = [Palette::UfrgsNoite, Palette::UfrgsDia, Palette::Dark, Palette::Light];
-
-    /// egui's light/dark appearance for this palette.
-    pub fn theme(self) -> Theme {
-        match self {
-            Palette::UfrgsNoite | Palette::Dark => Theme::Dark,
-            Palette::UfrgsDia | Palette::Light => Theme::Light,
-        }
-    }
-
-    pub fn tokens(self) -> Tokens {
-        match self {
-            Palette::UfrgsNoite => Tokens::NOITE,
-            Palette::UfrgsDia => Tokens::DIA,
-            Palette::Dark => Tokens::DARK,
-            Palette::Light => Tokens::LIGHT,
-        }
-    }
-
-    /// The Suíte FisiLab tones behind a UFRGS palette; `None` for the upstream ones.
-    pub fn brand(self) -> Option<&'static fisilab_brand::palette::Tons> {
-        match self {
-            Palette::UfrgsNoite => Some(&fisilab_brand::palette::NOITE),
-            Palette::UfrgsDia => Some(&fisilab_brand::palette::DIA),
-            Palette::Dark | Palette::Light => None,
-        }
-    }
-
-    /// The (dark, light) pair this palette belongs to; both are installed into egui together.
-    fn family(self) -> (Palette, Palette) {
-        match self {
-            Palette::UfrgsNoite | Palette::UfrgsDia => (Palette::UfrgsNoite, Palette::UfrgsDia),
-            Palette::Dark | Palette::Light => (Palette::Dark, Palette::Light),
-        }
-    }
-}
-
-/// The upstream palette of an egui appearance.
-impl From<Theme> for Palette {
-    fn from(theme: Theme) -> Palette {
-        match theme {
-            Theme::Dark => Palette::Dark,
-            Theme::Light => Palette::Light,
+            ThemePref::System => system.unwrap_or(SYSTEM_FALLBACK),
+            ThemePref::Light => Theme::Light,
+            ThemePref::Dark => Theme::Dark,
         }
     }
 }
 
 thread_local! {
-    /// The palette in use on the UI thread (set by [`set_active`] each frame).
-    static ACTIVE: Cell<Palette> = const { Cell::new(Palette::UfrgsNoite) };
+    /// The theme in use on the UI thread (set by [`set_active`] each frame).
+    static ACTIVE: Cell<Theme> = const { Cell::new(Theme::Dark) };
 }
 
-/// The light/dark appearance of the palette in use.
+/// The theme [`Tokens::get`] returns colours for.
 pub fn active() -> Theme {
-    ACTIVE.with(Cell::get).theme()
-}
-
-/// The palette [`Tokens::get`] returns colours for.
-pub fn active_palette() -> Palette {
     ACTIVE.with(Cell::get)
 }
 
-pub fn set_active(palette: impl Into<Palette>) {
-    let palette = palette.into();
-    ACTIVE.with(|a| a.set(palette));
+pub fn set_active(theme: Theme) {
+    ACTIVE.with(|a| a.set(theme));
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -204,8 +131,6 @@ pub struct Tokens {
     pub crosshair: Color32,
     /// The sheet of paper on a layout tab.
     pub paper: Color32,
-    /// Text on an [`Tokens::accent`] fill (primary buttons).
-    pub accent_text: Color32,
 }
 
 impl Tokens {
@@ -254,7 +179,6 @@ impl Tokens {
         warn: Color32::from_rgb(0xff, 0xd0, 0x80),
         crosshair: Color32::from_rgb(0xe8, 0xe8, 0xe8),
         paper: Color32::WHITE,
-        accent_text: Color32::from_rgb(0xd7, 0xdb, 0xe0),
     };
 
     /// Light grey chrome with dark text. The drawing-area colours (canvas, grid, axes, selection,
@@ -285,68 +209,20 @@ impl Tokens {
         list_bg: Color32::from_rgb(0xfb, 0xfc, 0xfd),
         list_row: Color32::from_rgb(0xe3, 0xe8, 0xef),
         warn: Color32::from_rgb(0x8a, 0x53, 0x00),
-        accent_text: Color32::from_rgb(0x1d, 0x23, 0x2b),
         ..Tokens::DARK
     };
 
-    /// "UFRGS Noite": the Suíte FisiLab's dark palette (the default), from
-    /// `fisilab_brand::palette::NOITE`. The drawing area keeps [`Tokens::DARK`]'s CAD colours
-    /// (selection, grips, snaps, crosshair, paper) on the brand's darkest tone.
-    pub const NOITE: Tokens = Tokens::ufrgs(&fisilab_brand::palette::NOITE);
-
-    /// "UFRGS Dia": the Suíte FisiLab's light palette, from `fisilab_brand::palette::DIA`. Like
-    /// [`Tokens::LIGHT`], only the chrome turns light: the drawing area is [`Tokens::NOITE`]'s.
-    pub const DIA: Tokens = Tokens::ufrgs(&fisilab_brand::palette::DIA);
-
-    /// The chrome of a UFRGS palette from the brand tones `b`. The drawing area is the same for
-    /// both: the model space on the dark theme's background, with grid and axes derived from it
-    /// as [`Tokens::with_model_background`] does.
-    const fn ufrgs(b: &fisilab_brand::palette::Tons) -> Tokens {
-        let canvas = fisilab_brand::palette::NOITE.fundo;
-        Tokens {
-            chrome: b.painel,
-            chrome_dark: b.fundo,
-            panel: b.painel,
-            tab_active: b.ativo,
-            control: b.elevado,
-            control_hover: b.hover,
-            border: b.borda,
-            canvas,
-            grid_minor: mix_const(canvas, Color32::WHITE, 50),
-            grid_major: mix_const(canvas, Color32::WHITE, 110),
-            axis_x: mix_const(canvas, Color32::from_rgb(0xd0, 0x30, 0x30), 300),
-            axis_y: mix_const(canvas, Color32::from_rgb(0x30, 0xb0, 0x40), 300),
-            text: b.texto,
-            text_dim: b.texto_fraco,
-            text_faint: mix_const(b.texto_fraco, b.painel, 200),
-            icon: b.texto,
-            icon_accent: b.foco,
-            icon_point: b.destaque,
-            accent: b.destaque,
-            cmd_bg: with_alpha(b.painel, 0xf0),
-            toggle_on: b.destaque,
-            field: b.elevado,
-            select_bg: b.selecao,
-            cmd_history: with_alpha(b.fundo, if b.escuro { 170 } else { 0xdc }),
-            cmd_border: b.borda,
-            cmd_keyword: b.foco,
-            cmd_keyword_hover: with_alpha(b.foco, 0x55),
-            list_bg: b.elevado,
-            list_row: b.hover,
-            warn: b.aviso,
-            accent_text: b.texto_destaque,
-            ..Tokens::DARK
+    /// The palette of `theme`.
+    pub fn of(theme: Theme) -> Tokens {
+        match theme {
+            Theme::Dark => Tokens::DARK,
+            Theme::Light => Tokens::LIGHT,
         }
     }
 
-    /// The upstream palette of `theme`.
-    pub fn of(theme: Theme) -> Tokens {
-        Palette::from(theme).tokens()
-    }
-
-    /// The palette in use, with the user's drawing-area colours ([`set_canvas`]).
+    /// The palette of the theme in use, with the user's drawing-area colours ([`set_canvas`]).
     pub fn get() -> Tokens {
-        CANVAS.with(Cell::get).over(active_palette().tokens())
+        CANVAS.with(Cell::get).over(Tokens::of(active()))
     }
 
     /// These tokens with `bg` as the model-space background: the grid, axes, crosshair and the
@@ -415,19 +291,6 @@ pub fn snap_marker_half() -> f32 {
 /// Relative luminance of `c` (0 black … 1 white).
 pub fn luminance(c: Color32) -> f32 {
     (0.299 * f32::from(c.r()) + 0.587 * f32::from(c.g()) + 0.114 * f32::from(c.b())) / 255.0
-}
-
-/// `a` moved `permille` thousandths of the way towards `b`, in const context (the palettes).
-const fn mix_const(a: Color32, b: Color32, permille: u32) -> Color32 {
-    const fn m(x: u8, y: u8, f: u32) -> u8 {
-        ((x as u32 * (1000 - f) + y as u32 * f + 500) / 1000) as u8
-    }
-    Color32::from_rgb(m(a.r(), b.r(), permille), m(a.g(), b.g(), permille), m(a.b(), b.b(), permille))
-}
-
-/// `c` with the (unmultiplied) alpha `a`.
-const fn with_alpha(c: Color32, a: u8) -> Color32 {
-    Color32::from_rgba_unmultiplied_const(c.r(), c.g(), c.b(), a)
 }
 
 /// `a` moved the fraction `f` towards `b`.
@@ -771,10 +634,9 @@ pub fn can_show(language: &str) -> bool {
     }
 }
 
-/// egui's visuals for `palette`, from its tokens.
-fn visuals(palette: Palette) -> Visuals {
-    let theme = palette.theme();
-    let t = palette.tokens();
+/// egui's visuals for `theme`, from its tokens.
+fn visuals(theme: Theme) -> Visuals {
+    let t = Tokens::of(theme);
     let mut v = match theme {
         Theme::Dark => Visuals::dark(),
         Theme::Light => Visuals::light(),
@@ -800,33 +662,16 @@ fn visuals(palette: Palette) -> Visuals {
     v.popup_shadow = egui::epaint::Shadow { offset: [0, 4], blur: 12, spread: 0, color: shadow };
     v.window_corner_radius = egui::CornerRadius::same(6);
     v.menu_corner_radius = egui::CornerRadius::same(5);
-    if let Some(b) = palette.brand() {
-        // The UFRGS palettes: links, warnings, errors and selected text from the brand tones, and
-        // shadows in the brand's darkest tone instead of plain black.
-        v.hyperlink_color = b.foco;
-        v.warn_fg_color = b.aviso;
-        v.error_fg_color = b.erro;
-        v.selection.stroke.color = b.texto;
-        v.widgets.active.fg_stroke.color = b.texto_destaque;
-        let deep = fisilab_brand::palette::NOITE.fundo;
-        let shadow = Color32::from_rgba_unmultiplied(deep.r(), deep.g(), deep.b(), if b.escuro { 150 } else { 60 });
-        v.popup_shadow.color = shadow;
-        v.window_shadow.color = shadow;
-    }
     v
 }
 
-/// Install the styles of both themes of `palette`'s family (UFRGS Noite and Dia, or the upstream
-/// Dark and Light) and show `palette` (egui's own widgets, popups and menus follow it; our own
-/// painting follows [`Tokens::get`]). `follow_system` is true for the [`ThemePref::System`]
-/// choice, whose palette was resolved from the OS report.
-pub fn apply(ctx: &egui::Context, palette: impl Into<Palette>, follow_system: bool) {
-    let palette = palette.into();
-    let theme = palette.theme();
-    set_active(palette);
-    let (dark, light) = palette.family();
-    ctx.set_visuals_of(Theme::Dark, visuals(dark));
-    ctx.set_visuals_of(Theme::Light, visuals(light));
+/// Install the styles of both themes and show `theme` (egui's own widgets, popups and menus
+/// follow it; our own painting follows [`Tokens::get`]). `follow_system` is true for the
+/// [`ThemePref::System`] choice, whose `theme` was resolved from the OS report.
+pub fn apply(ctx: &egui::Context, theme: Theme, follow_system: bool) {
+    set_active(theme);
+    ctx.set_visuals_of(Theme::Dark, visuals(Theme::Dark));
+    ctx.set_visuals_of(Theme::Light, visuals(Theme::Light));
     // A System choice keeps egui's own System preference: a concrete Light/Dark would pin the native
     // window appearance (winit then stops reporting OS changes) and the app would never follow again.
     ctx.set_theme(if follow_system { egui::ThemePreference::System } else { egui::ThemePreference::from(theme) });
@@ -848,81 +693,5 @@ mod tests {
         for bytes in [vec![], vec![0xff; 32], vec![0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]] {
             assert!(super::korean_face(std::sync::Arc::new(bytes)).is_none());
         }
-    }
-
-    use super::{Palette, ThemePref, Tokens};
-    use egui::Color32;
-
-    /// WCAG contrast ratio of two opaque colours.
-    fn contrast(a: Color32, b: Color32) -> f32 {
-        let lum = |c: Color32| {
-            let f = |x: u8| {
-                let s = f32::from(x) / 255.0;
-                if s <= 0.039_28 { s / 12.92 } else { ((s + 0.055) / 1.055).powf(2.4) }
-            };
-            0.2126 * f(c.r()) + 0.7152 * f(c.g()) + 0.0722 * f(c.b())
-        };
-        let (x, y) = (lum(a), lum(b));
-        (x.max(y) + 0.05) / (x.min(y) + 0.05)
-    }
-
-    #[test]
-    fn ufrgs_noite_is_the_default_and_the_ufrgs_themes_come_first() {
-        assert_eq!(ThemePref::default(), ThemePref::UfrgsNoite);
-        assert_eq!(&ThemePref::ALL[..2], &[ThemePref::UfrgsNoite, ThemePref::UfrgsDia]);
-        assert_eq!(ThemePref::default().palette(Some(egui::Theme::Light)), Palette::UfrgsNoite, "a fixed choice ignores the OS");
-        assert_eq!(Palette::UfrgsNoite.theme(), egui::Theme::Dark);
-        assert_eq!(Palette::UfrgsDia.theme(), egui::Theme::Light);
-    }
-
-    #[test]
-    fn theme_names_round_trip() {
-        for t in ThemePref::ALL {
-            assert_eq!(ThemePref::parse(t.as_str()), Some(t));
-            assert_eq!(serde_json::to_value(t).ok().and_then(|v| v.as_str().map(str::to_owned)).as_deref(), Some(t.as_str()));
-        }
-        assert_eq!(ThemePref::parse("ufrgsnoite"), Some(ThemePref::UfrgsNoite));
-        assert_eq!(ThemePref::parse(" UFRGSDIA "), Some(ThemePref::UfrgsDia));
-        assert_eq!(ThemePref::parse("sepia"), None);
-    }
-
-    #[test]
-    fn ufrgs_palettes_come_from_the_brand() {
-        let (n, d) = (&fisilab_brand::palette::NOITE, &fisilab_brand::palette::DIA);
-        assert_eq!((Tokens::NOITE.panel, Tokens::NOITE.accent, Tokens::NOITE.text), (n.painel, n.destaque, n.texto));
-        assert_eq!((Tokens::DIA.panel, Tokens::DIA.accent, Tokens::DIA.text), (d.painel, d.destaque, d.texto));
-        // The drawing area keeps one model-space look in both, as upstream's Light does.
-        assert_eq!(Tokens::DIA.canvas, Tokens::NOITE.canvas);
-        assert_eq!(Tokens::NOITE.canvas, n.fundo);
-        assert_eq!(Tokens::NOITE.with_model_background(n.fundo).grid_major, Tokens::NOITE.grid_major, "grid derived from the background");
-    }
-
-    #[test]
-    fn every_theme_keeps_its_text_readable() {
-        // Only the suite's own palettes: the upstream ones keep their original colours.
-        for p in Palette::ALL.into_iter().filter(|p| p.brand().is_some()) {
-            let t = p.tokens();
-            for bg in [t.chrome, t.chrome_dark, t.panel, t.control, t.field, t.list_bg] {
-                assert!(contrast(t.text, bg) >= 4.5, "{p:?}: text {:?} on {bg:?}", t.text);
-                assert!(contrast(t.text_dim, bg) >= 3.0, "{p:?}: dim text {:?} on {bg:?}", t.text_dim);
-            }
-            assert!(contrast(t.text_faint, t.panel) >= 2.5, "{p:?}: faint text");
-            assert!(contrast(t.accent_text, t.accent) >= 4.5, "{p:?}: text on accent");
-            assert!(contrast(t.cmd_keyword, t.panel) >= 3.0, "{p:?}: command-line keywords");
-        }
-    }
-
-    #[test]
-    fn applying_a_palette_installs_its_family() {
-        let ctx = egui::Context::default();
-        super::apply(&ctx, Palette::UfrgsDia, false);
-        assert_eq!(super::active_palette(), Palette::UfrgsDia);
-        assert_eq!(Tokens::get(), Tokens::DIA);
-        assert_eq!(ctx.theme(), egui::Theme::Light);
-        assert_eq!(ctx.style_of(egui::Theme::Dark).visuals.panel_fill, Tokens::NOITE.panel);
-        assert_eq!(ctx.style_of(egui::Theme::Light).visuals.panel_fill, Tokens::DIA.panel);
-        super::apply(&ctx, egui::Theme::Dark, false);
-        assert_eq!(Tokens::get(), Tokens::DARK);
-        assert_eq!(ctx.style_of(egui::Theme::Light).visuals.panel_fill, Tokens::LIGHT.panel);
     }
 }

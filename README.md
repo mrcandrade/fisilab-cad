@@ -47,8 +47,8 @@ fluxo de trabalho do AutoCAD.
 
 Baixe o instalador `FisiLab-CAD-Setup-<versão>.exe` no portal de downloads da Suíte FisiLab ou na
 página de [Releases do mrcandrade/fisilab-cad](https://github.com/mrcandrade/fisilab-cad/releases) e
-execute-o. O CAD abre em português do Brasil e com o tema **UFRGS Noite**; o idioma e o tema
-(**UFRGS Dia**, Claro, Escuro ou o do sistema) podem ser trocados no menu e nas Opções.
+execute-o. O CAD abre em português do Brasil na primeira execução, com a paleta original no tema
+**Noite**; o idioma e o tema (**Dia** ou o do sistema) podem ser trocados no menu e nas Opções.
 
 ### Compilar a partir do código
 

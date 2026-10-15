@@ -1327,7 +1327,7 @@
 	Justify	За шириною
 	Text color	Колір тексту
 	Click the ruler to add a tab stop, right-click to remove one	Натисніть на лінійку, щоб додати табуляцію; права кнопка видаляє її
-# Suíte FisiLab (CAD): theme names and the suite About window.
-	UFRGS Noite	UFRGS Noite
-	UFRGS Dia	UFRGS Dia
+# Suíte FisiLab (CAD): the Noite/Dia theme names and the suite About window.
+	Noite	Noite
+	Dia	Dia
 	Sobre a Suíte FisiLab…	Про набір програм FisiLab…

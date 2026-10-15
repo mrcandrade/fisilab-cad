@@ -1241,7 +1241,7 @@
 	Query Texts	Consultar textos
 	Run Script...	Executar script...
 	Not a number or distance: {text}	Não é um número nem uma distância: {text}
-# Suíte FisiLab (CAD): theme names and the suite About window.
-	UFRGS Noite	UFRGS Noite
-	UFRGS Dia	UFRGS Dia
+# Suíte FisiLab (CAD): the Noite/Dia theme names and the suite About window.
+	Noite	Noite
+	Dia	Dia
 	Sobre a Suíte FisiLab…	Sobre a Suíte FisiLab…
